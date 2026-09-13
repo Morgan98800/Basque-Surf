@@ -1,134 +1,179 @@
-import { Spot, TideData, SpotScore, TideMatchQuality } from '../types/index';
+import { Spot, TideData, SpotScore, TideMatchQuality, HazardLevel, SurfLevel } from '../types/index';
+import { SpotEnriched, MarineConditions, BreakType, SurfLevelGrade, SpotHazard } from '../scoring/types';
+import { scoreSpot } from '../scoring/engine';
 
-export function evaluateSpotConditions(spot: Spot, tide: TideData): SpotScore {
-  const { currentHeight, currentPhase, coefficient, hourlyCurve } = tide;
-  const { minHeight, maxHeight, preferredPhases } = spot.optimalTideRange;
+export function spotToEnriched(spot: Spot): SpotEnriched {
+  const breakType: BreakType =
+    spot.type === 'point_break' ? 'pointbreak' :
+    spot.type === 'reef_break' ? 'reef' : 'beach';
 
-  let baseScore = 6.5;
-  let explanation = '';
-  let matchQuality: TideMatchQuality = 'good';
+  const preferredPhase: 'rising' | 'falling' | 'any' =
+    spot.optimalTideRange.preferredPhases.includes('incoming') && !spot.optimalTideRange.preferredPhases.includes('outgoing')
+      ? 'rising'
+      : spot.optimalTideRange.preferredPhases.includes('outgoing') && !spot.optimalTideRange.preferredPhases.includes('incoming')
+      ? 'falling'
+      : 'any';
 
-  // 1. CAS PARTICULIER CRITIQUE : Côte des Basques à marée haute
-  if (spot.id === 'biarritz-cote-des-basques') {
-    if (currentHeight >= 3.3 || currentPhase === 'high') {
-      const cliffFactor = Math.min(1.0, Math.max(0, (currentHeight - 3.2) / 1.5));
-      const score = Number((1.8 - cliffFactor * 0.8).toFixed(1)); // Score stable 1.0 - 1.8
-      return {
-        score,
-        scoreFormatted: score.toFixed(1).replace('.', ','),
-        label: 'Dangereux / Impraticable',
-        explanation: 'La marée est trop haute. L’eau submerge totalement le sable et frappe la digue rocheuse.',
-        matchQuality: 'dangerous',
-        warning: 'Danger Digue : La plage est totalement submergée. Risque de projection contre les enrochements et escaliers.',
-        hazardLevel: 'danger',
-        hazardChip: 'Danger Digue',
-        bestWindowToday: findBestWindow(spot, hourlyCurve)
-      };
-    }
+  const levelGradeMap: Record<SurfLevel, { min: SurfLevelGrade; max: SurfLevelGrade }> = {
+    'Débutant': { min: 1, max: 2 },
+    'Tous niveaux': { min: 1, max: 4 },
+    'Intermédiaire': { min: 3, max: 4 },
+    'Confirmé': { min: 4, max: 5 },
+    'Expert': { min: 5, max: 5 },
+  };
+
+  const hazards: SpotHazard[] = [];
+  if (spot.id === 'biarritz-cote-des-basques' || spot.highTideRisk) {
+    hazards.push({
+      id: 'cote-des-basques-digue',
+      label: 'Danger Digue',
+      description: 'Plage submergée à marée haute.',
+      severity: 'critical',
+      triggerCondition: 'high_tide'
+    });
   }
-
-  // 2. Vérification de la hauteur d'eau par rapport à la plage optimale du spot
-  const optimalMid = (minHeight + maxHeight) / 2;
-  const heightSpan = (maxHeight - minHeight) / 2;
-
-  if (currentHeight >= minHeight && currentHeight <= maxHeight) {
-    // Parfaitement dans la fenêtre d'eau
-    const distFromCenter = Math.abs(currentHeight - optimalMid) / heightSpan; // 0 (plein centre) à 1 (sur les bords)
-    const heightBonus = 2.2 * (1 - distFromCenter * 0.4); // +1.3 à +2.2
-    baseScore += heightBonus;
-    explanation += `Hauteur d'eau idéale (${currentHeight}m) pour ce spot. `;
-  } else if (currentHeight < minHeight) {
-    const diff = minHeight - currentHeight;
-    baseScore -= diff * 2.8;
-    explanation += `Manque d'eau (${currentHeight}m) : risque de vagues fermantes ou roche apparente. `;
-    if (diff > 0.6) {
-      matchQuality = 'poor';
-    }
-  } else {
-    // currentHeight > maxHeight
-    const diff = currentHeight - maxHeight;
-    baseScore -= diff * 2.5;
-    explanation += `Trop d'eau (${currentHeight}m) : les vagues peuvent devenir molles ou saturer en shorebreak. `;
-    if (diff > 0.6) {
-      matchQuality = 'poor';
-    }
-  }
-
-  // 3. Adéquation de la phase (montante vs descendante vs basse vs haute)
-  const isPreferredPhase = preferredPhases.includes(currentPhase);
-  if (isPreferredPhase) {
-    baseScore += 0.8;
-    if (currentPhase === 'incoming') {
-      explanation += 'La marée montante dynamise le déferlement. ';
-    }
-  } else {
-    baseScore -= 0.6;
-    if (currentPhase === 'high') {
-      explanation += 'Pleine mer : section souvent aplatie. ';
-    } else if (currentPhase === 'low') {
-      explanation += 'Basse mer : vagues plus rapides et fermantes. ';
-    }
-  }
-
-  // 4. Coefficient de marée
-  // Les forts coefficients (>80) accentuent le courant de baïne sur Anglet
-  if (spot.town === 'Anglet' && coefficient >= 80) {
-    baseScore -= 0.4;
-    explanation += `Fort coeff (${coefficient}) : méfiance baïnes et fort courant de vidange. `;
-  } else if (coefficient >= 60 && coefficient <= 85) {
-    // Bon coefficient de surf
-    baseScore += 0.3;
-  }
-
-  // Ajustement pseudo-aléatoire déterministe pour avoir des décimales précises
-  // basées sur l'ID du spot et l'heure pour ne pas avoir de valeurs rondes
-  const charSum = spot.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const subtleVariation = ((charSum % 7) - 3) * 0.08;
-  baseScore += subtleVariation;
-
-  // Bornes de 1.0 à 9.8
-  let finalScore = Math.min(9.8, Math.max(1.0, baseScore));
-  // Arrondi à un chiffre après la virgule
-  finalScore = Math.round(finalScore * 10) / 10;
-
-  // Attribution du label et de la qualité
-  let label = 'Conditions moyennes';
-  if (finalScore >= 8.5) {
-    label = 'Session parfaite';
-    matchQuality = 'perfect';
-  } else if (finalScore >= 7.0) {
-    label = 'Très bonnes conditions';
-    matchQuality = 'good';
-  } else if (finalScore >= 5.0) {
-    label = 'Conditions correctes';
-    matchQuality = 'average';
-  } else {
-    label = 'Conditions médiocres';
-    matchQuality = 'poor';
-  }
-
-  const scoreFormatted = finalScore.toFixed(1).replace('.', ',');
-
-  const hazardLevel = spot.hazardLevel || 'caution';
-  const hazardChip = spot.hazardChip || (spot.level === 'Tous niveaux' ? 'Débutants' : 'Prudence');
 
   return {
-    score: finalScore,
-    scoreFormatted,
-    label,
-    explanation: explanation.trim(),
+    id: spot.id,
+    name: spot.name,
+    town: spot.town,
+    breakType,
+    swellWindow: spot.swellWindow || { dirMin: 270, dirMax: 335 },
+    exposure: spot.exposure ?? 0.85,
+    sizeRange: spot.sizeRange || { min: 0.8, max: 2.2 },
+    optimalSize: spot.optimalSize ?? 1.4,
+    offshoreDir: spot.offshoreDir ?? 105,
+    windTolerance: 45,
+    tideWindow: {
+      min: spot.optimalTideRange.minHeight,
+      max: spot.optimalTideRange.maxHeight
+    },
+    preferredPhase,
+    hazards,
+    baineRisk: spot.baineRisk ?? (breakType === 'beach' ? 0.7 : 0.1),
+    levelRange: levelGradeMap[spot.level] || { min: 1, max: 4 },
+    levelLabel: spot.level,
+    lat: spot.lat,
+    lon: spot.lon,
+    coefMareeSlug: spot.coefMareeSlug,
+    description: spot.description
+  };
+}
+
+export function evaluateSpotConditions(
+  spot: Spot,
+  tide: TideData,
+  hourlyMarine?: MarineConditions[],
+  targetDate: Date = new Date()
+): SpotScore {
+  const spotEnriched = spotToEnriched(spot);
+  const now = new Date();
+  const isSameDay =
+    targetDate.getDate() === now.getDate() &&
+    targetDate.getMonth() === now.getMonth() &&
+    targetDate.getFullYear() === now.getFullYear();
+
+  const activeHour = isSameDay ? now.getHours() : 11; // 11:00 pour la prévision diurne des jours futurs
+
+  // 1. Préparer ou synchroniser la courbe marine 24h avec la marée SHOM/locale
+  let syncedCurve: MarineConditions[] = [];
+
+  if (hourlyMarine && hourlyMarine.length === 24) {
+    syncedCurve = hourlyMarine.map((m, idx) => {
+      const tidePt = tide.hourlyCurve[idx];
+      return {
+        ...m,
+        tideHeight: tidePt ? tidePt.height : tide.currentHeight,
+        tidePhase: tide.currentPhase,
+        tideCoefficient: tide.coefficient
+      };
+    });
+  } else {
+    // Mode repli réaliste si la météo marine n'est pas encore prête
+    syncedCurve = Array.from({ length: 24 }, (_, h) => {
+      const tidePt = tide.hourlyCurve[h];
+      return {
+        timestamp: targetDate.getTime() + h * 3600 * 1000,
+        timeStr: `${h.toString().padStart(2, '0')}:00`,
+        swellHeight: 1.3,
+        swellPeriod: 12,
+        swellDirection: 295,
+        windWaveHeight: 0.2,
+        windSpeedKts: 7,
+        windDirection: spot.offshoreDir || 105,
+        tideHeight: tidePt ? tidePt.height : tide.currentHeight,
+        tidePhase: tide.currentPhase,
+        tideCoefficient: tide.coefficient
+      };
+    });
+  }
+
+  // 2. Condition instantanée pour l'évaluation
+  const instantCondition: MarineConditions = {
+    ...syncedCurve[activeHour],
+    tideHeight: isSameDay ? tide.currentHeight : (syncedCurve[activeHour]?.tideHeight ?? tide.currentHeight),
+    tidePhase: isSameDay ? tide.currentPhase : 'incoming',
+    tideCoefficient: tide.coefficient
+  };
+
+  // 3. Calcul du score v2
+  const v2Score = scoreSpot(spotEnriched, instantCondition, syncedCurve, targetDate);
+
+  // 4. Déduction des statuts UI et labels
+  const matchQuality: TideMatchQuality =
+    v2Score.hazard === 'critical'
+      ? 'dangerous'
+      : v2Score.quality >= 8.5
+      ? 'perfect'
+      : v2Score.quality >= 7.0
+      ? 'good'
+      : v2Score.quality >= 5.0
+      ? 'average'
+      : 'poor';
+
+  const hazardLevel: HazardLevel =
+    v2Score.hazard === 'critical' ? 'danger' : v2Score.hazard === 'caution' ? 'caution' : 'safe';
+
+  // Meilleur créneau
+  let bestWindowToday = v2Score.bestWindow
+    ? `${v2Score.bestWindow.start} - ${v2Score.bestWindow.end}`
+    : findBestWindow(spot, tide.hourlyCurve);
+
+  if (v2Score.hazard === 'critical' && spot.id === 'biarritz-cote-des-basques') {
+    // À marée haute, préciser les créneaux praticables
+    bestWindowToday = findBestWindow(spot, tide.hourlyCurve);
+  }
+
+  // Explication claire et synthétique
+  const effectiveSize = v2Score.breakdown.effectiveSwellHeight;
+  const angleDiff = Math.abs((instantCondition.windDirection - (spot.offshoreDir || 105) + 360) % 360);
+  const isOffshore = angleDiff <= 45 || angleDiff >= 315;
+  const offshoreLabel = isOffshore ? 'offshore' : 'onshore';
+  const explanation = `${effectiveSize.toFixed(1)}m prévus (${instantCondition.swellHeight.toFixed(1)}m au large @ ${Math.round(instantCondition.swellPeriod)}s). Vent ${Math.round(instantCondition.windSpeedKts)} kts ${offshoreLabel}. Marée ${instantCondition.tideHeight.toFixed(1)}m.`;
+
+  const warning = v2Score.hazardReasons.length > 0
+    ? v2Score.hazardReasons[0]
+    : (hazardLevel === 'danger' ? spot.hazards : undefined);
+
+  return {
+    score: v2Score.quality,
+    scoreFormatted: v2Score.qualityFormatted,
+    label: v2Score.label,
+    explanation,
     matchQuality,
     hazardLevel,
-    hazardChip,
-    warning: hazardLevel === 'danger' ? spot.hazards : undefined,
-    bestWindowToday: findBestWindow(spot, hourlyCurve)
+    hazardChip: v2Score.hazardChip,
+    warning,
+    bestWindowToday,
+    confidence: v2Score.confidence,
+    breakdown: v2Score.breakdown
   };
 }
 
 /**
- * Calcule le meilleur créneau horaire de la journée pour ce spot en fonction de sa courbe de marée
+ * Détecte les fenêtres de marée optimales de jour (multi-créneaux matin/après-midi)
  */
-function findBestWindow(spot: Spot, curve: { time: string; height: number }[]): string {
+export function findBestWindow(spot: Spot, curve: { time: string; height: number }[]): string {
   const { minHeight, maxHeight } = spot.optimalTideRange;
   const matchingPoints = curve.filter(
     (p) => p.height >= minHeight - 0.15 && p.height <= maxHeight + 0.15
@@ -138,7 +183,6 @@ function findBestWindow(spot: Spot, curve: { time: string; height: number }[]): 
     return 'Conditions marginales';
   }
 
-  // Grouper en blocs continus d'heures consécutives
   const blocks: { start: string; end: string; startHour: number; endHour: number }[] = [];
   let currentBlock: { time: string; hour: number }[] = [];
 
@@ -175,7 +219,6 @@ function findBestWindow(spot: Spot, curve: { time: string; height: number }[]): 
     });
   }
 
-  // Privilégier les sessions de jour (07:00 à 21:00) si disponibles, max 2 créneaux
   const daytimeBlocks = blocks.filter((b) => b.endHour >= 7 && b.startHour <= 21);
   const selectedBlocks = (daytimeBlocks.length > 0 ? daytimeBlocks : blocks).slice(0, 2);
 

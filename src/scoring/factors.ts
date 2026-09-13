@@ -13,9 +13,9 @@ import { WEIGHTS } from './weights';
 export function calculateFSwell(spot: SpotEnriched, conditions: MarineConditions): { fSwell: number; effectiveHeight: number; rawEnergy: number } {
   const { swellHeight, swellPeriod, swellDirection } = conditions;
 
-  // Si pas de houle au large, score 0 immédiat
-  if (swellHeight <= 0.1) {
-    return { fSwell: 0.05, effectiveHeight: 0, rawEnergy: 0 };
+  // Si pas de houle au large, score plancher immédiat
+  if (swellHeight <= 0.15) {
+    return { fSwell: 0.01, effectiveHeight: 0, rawEnergy: 0 };
   }
 
   // Énergie brute au large (H² * T)
@@ -37,8 +37,8 @@ export function calculateFSwell(spot: SpotEnriched, conditions: MarineConditions
     if (dMin > 180) dMin = 360 - dMin;
     if (dMax > 180) dMax = 360 - dMax;
     const diff = Math.min(dMin, dMax);
-    // Décroissance exponentielle douce si la houle vient de biais
-    angularFactor = Math.exp(-Math.pow(diff / 35, 2));
+    // Décroissance exponentielle si la houle vient hors de la fenêtre du spot (ex: houle de Nord)
+    angularFactor = Math.exp(-Math.pow(diff / 16, 1.8));
   }
 
   // Hauteur de houle efficace reçue au déferlement
@@ -49,9 +49,9 @@ export function calculateFSwell(spot: SpotEnriched, conditions: MarineConditions
   const { min: sMin, max: sMax } = spot.sizeRange;
   const opt = spot.optimalSize;
 
-  if (effectiveHeight < 0.2) {
-    // Trop petit pour surfer
-    return { fSwell: 0.08, effectiveHeight, rawEnergy };
+  if (effectiveHeight < 0.25) {
+    // Vaguelettes ou mer plate < 25cm inexploitable
+    return { fSwell: 0.01, effectiveHeight, rawEnergy };
   }
 
   let fSwell: number;
@@ -64,17 +64,22 @@ export function calculateFSwell(spot: SpotEnriched, conditions: MarineConditions
   } else if (effectiveHeight < sMin) {
     // Sous la taille minimale requise (vagues trop molles / sans fond)
     const diff = sMin - effectiveHeight;
-    fSwell = 0.82 * Math.exp(-Math.pow(diff / 0.45, 2));
+    fSwell = 0.82 * Math.exp(-Math.pow(diff / 0.18, 1.8));
   } else {
     // Au-dessus de la taille maximale (saturation, barres infranchissables, fermetures)
     const diff = effectiveHeight - sMax;
-    // Les spots experts saturent moins vite que les beach breaks débutants
-    const tolerance = spot.levelRange.max >= 4 ? 0.9 : 0.55;
-    fSwell = 0.82 * Math.exp(-Math.pow(diff / tolerance, 2));
+    // Les beach-breaks ferment et saturent brutalement par rapport aux pointbreaks/reefs
+    const tolerance = spot.breakType === 'beach' ? 0.35 : (spot.levelRange.max >= 4 ? 0.85 : 0.50);
+    fSwell = 0.82 * Math.exp(-Math.pow(diff / tolerance, 1.8));
+  }
+
+  // Si la houle était hors de la fenêtre d'entrée, pénaliser aussi la qualité de forme
+  if (!inWindow) {
+    fSwell *= (0.20 + 0.80 * angularFactor);
   }
 
   return {
-    fSwell: Math.max(0.02, Math.min(1.0, fSwell)),
+    fSwell: Math.max(0.01, Math.min(1.0, fSwell)),
     effectiveHeight: Number(effectiveHeight.toFixed(2)),
     rawEnergy: Number(rawEnergy.toFixed(1))
   };
@@ -161,12 +166,12 @@ export function calculateFWind(spot: SpotEnriched, windSpeedKts: number, windDir
   } else {
     // Vent défavorable (Plein Onshore)
     // Détruit le plan d'eau et hache les vagues
-    const onshoreFactor = Math.abs(align); // 0.2 à 1.0
-    const speedRatio = Math.min(1.0, (windSpeedKts - glassoffThreshold) / 20);
-    fWind = Math.max(0.08, 0.80 - speedRatio * 0.70 * onshoreFactor);
+    const onshoreFactor = Math.max(0.3, Math.abs(align)); // 0.3 à 1.0
+    const excess = Math.max(0, windSpeedKts - glassoffThreshold);
+    fWind = 0.90 * Math.exp(-Math.pow((excess * onshoreFactor) / 6.2, 1.7));
   }
 
-  return Math.max(0.05, Math.min(1.0, fWind));
+  return Math.max(0.005, Math.min(1.0, fWind));
 }
 
 /**

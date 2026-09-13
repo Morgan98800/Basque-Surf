@@ -3,6 +3,8 @@ import { BASQUE_SPOTS, TOWN_TO_SLUG } from './data/spots';
 import { Spot, TideData, BasqueTown } from './types/index';
 import { fetchTideData } from './services/tides';
 import { evaluateSpotConditions } from './services/scoring';
+import { OpenMeteoMarineProvider } from './providers/openMeteoMarine';
+import { MarineConditions } from './scoring/types';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
 import { DateSelector } from './components/DateSelector';
@@ -15,7 +17,10 @@ const FAVORITES_STORAGE_KEY = 'basque_surf_favorites';
 
 export const App: React.FC = () => {
   const [tidesByTown, setTidesByTown] = useState<Record<string, TideData>>({});
+  const [marineByTown, setMarineByTown] = useState<Record<string, MarineConditions[]>>({});
   const [loading, setLoading] = useState<boolean>(true);
+
+  const marineProvider = useMemo(() => new OpenMeteoMarineProvider(), []);
 
   // Jour sélectionné : 0 = Aujourd'hui, 1 = Demain ... jusqu'à 6 (7 jours)
   const [selectedDayOffset, setSelectedDayOffset] = useState<number>(0);
@@ -59,28 +64,40 @@ export const App: React.FC = () => {
     } catch {}
   }, []);
 
-  // Chargement des marées officielles de la Côte Basque selon le jour choisi
+  // Chargement des marées officielles et prévisions marines de la Côte Basque selon le jour choisi
   const loadAllTides = async (offset: number) => {
     setLoading(true);
     const slugs = ['biarritz', 'anglet', 'bidart', 'guethary', 'saint-jean-de-luz', 'hendaye'];
     const newTides: Record<string, TideData> = {};
+    const newMarine: Record<string, MarineConditions[]> = {};
 
     try {
-      const biarritzData = await fetchTideData('biarritz', offset);
-      newTides['biarritz'] = biarritzData;
+      const [biarritzTide, biarritzMarine] = await Promise.all([
+        fetchTideData('biarritz', offset),
+        marineProvider.getConditionsForTown('biarritz', offset)
+      ]);
+      newTides['biarritz'] = biarritzTide;
+      newMarine['biarritz'] = biarritzMarine;
       setTidesByTown({ ...newTides });
+      setMarineByTown({ ...newMarine });
 
       const others = slugs.filter(s => s !== 'biarritz');
-      const results = await Promise.allSettled(others.map(slug => fetchTideData(slug, offset)));
-      
-      results.forEach((res, index) => {
-        const slug = others[index];
-        newTides[slug] = res.status === 'fulfilled' ? res.value : biarritzData;
+      const [tideResults, marineResults] = await Promise.all([
+        Promise.allSettled(others.map(slug => fetchTideData(slug, offset))),
+        Promise.allSettled(others.map(slug => marineProvider.getConditionsForTown(slug, offset)))
+      ]);
+
+      others.forEach((slug, index) => {
+        const tRes = tideResults[index];
+        const mRes = marineResults[index];
+        newTides[slug] = tRes.status === 'fulfilled' ? tRes.value : biarritzTide;
+        newMarine[slug] = mRes.status === 'fulfilled' ? mRes.value : biarritzMarine;
       });
 
       setTidesByTown({ ...newTides });
+      setMarineByTown({ ...newMarine });
     } catch (err) {
-      console.error('Erreur chargement marées', err);
+      console.error('Erreur chargement marées et météo marine', err);
     } finally {
       setLoading(false);
     }
@@ -109,14 +126,22 @@ export const App: React.FC = () => {
     return tidesByTown['biarritz'] || null;
   }, [selectedTown, tidesByTown]);
 
-  // Scores par spot avec marée locale dédiée
+  const targetDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + selectedDayOffset);
+    return d;
+  }, [selectedDayOffset]);
+
+  // Scores par spot avec marée locale dédiée et conditions météo-marines v2
   const spotsWithScores = useMemo(() => {
     const fallbackTide = tidesByTown['biarritz'];
     if (!fallbackTide) return [];
+    const fallbackMarine = marineByTown['biarritz'];
 
     return BASQUE_SPOTS.map((spot) => {
       const spotTide = tidesByTown[spot.coefMareeSlug] || fallbackTide;
-      const score = evaluateSpotConditions(spot, spotTide);
+      const spotMarine = marineByTown[spot.coefMareeSlug] || fallbackMarine;
+      const score = evaluateSpotConditions(spot, spotTide, spotMarine, targetDate);
       return {
         spot,
         score,
@@ -124,9 +149,9 @@ export const App: React.FC = () => {
         isFavorite: favorites.includes(spot.id),
       };
     });
-  }, [tidesByTown, favorites]);
+  }, [tidesByTown, marineByTown, favorites, targetDate]);
 
-  // Filtrage et Tri (Toujours trié par meilleure note pour le surfeur)
+  // Filtrage et Tri (Toujours trié par meilleure note pour le surfeur, spots dangereux isolés en sécurité)
   const filteredSpots = useMemo(() => {
     return spotsWithScores
       .filter(({ spot, isFavorite }) => {
@@ -143,7 +168,11 @@ export const App: React.FC = () => {
         }
         return true;
       })
-      .sort((a, b) => b.score.score - a.score.score);
+      .sort((a, b) => {
+        if (a.score.matchQuality === 'dangerous' && b.score.matchQuality !== 'dangerous') return 1;
+        if (b.score.matchQuality === 'dangerous' && a.score.matchQuality !== 'dangerous') return -1;
+        return b.score.score - a.score.score;
+      });
   }, [spotsWithScores, searchTerm, selectedTown, showFavoritesOnly]);
 
   const selectedSpotTide = useMemo(() => {

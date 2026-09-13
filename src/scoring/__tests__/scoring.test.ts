@@ -278,3 +278,10 @@ export function runArchetypeTests(): { passed: boolean; results: string[] } {
 
   return { passed: allPassed, results: logs };
 }
+
+const { passed, results } = runArchetypeTests();
+console.log(`\n=== SCORING ENGINE V2 TEST RESULTS ===`);
+results.forEach(r => console.log(r));
+console.log(`\nStatus: ${passed ? 'ALL TESTS PASSED ✅' : 'SOME TESTS FAILED ❌'}`);
+if (!passed) throw new Error('Scoring engine tests failed');
+
