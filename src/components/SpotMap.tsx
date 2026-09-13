@@ -71,43 +71,45 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     spots.forEach(({ spot, score, isFavorite }) => {
       const isSelected = selectedSpot?.id === spot.id;
 
-      let badgeBg = '#14b8a6';
-      if (score.matchQuality === 'dangerous') badgeBg = '#f43f5e';
-      else if (score.score < 5.0) badgeBg = '#64748b';
-      else if (score.score < 7.0) badgeBg = '#0284c7';
+      let badgeBg = '#34C759'; // Vert iOS
+      if (score.matchQuality === 'dangerous') badgeBg = '#FF3B30'; // Rouge iOS
+      else if (score.score < 5.0) badgeBg = '#8E8E93'; // Gris iOS
+      else if (score.score < 7.0) badgeBg = '#007AFF'; // Bleu iOS
 
       const html = `
         <div class="spot-marker ${isSelected ? 'marker-selected' : ''}" style="
           display: flex;
           align-items: center;
-          background: #0e1822;
-          border: 1.5px solid ${isSelected ? '#2dd4bf' : '#1b2a38'};
+          background: rgba(28, 28, 30, 0.92);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1.5px solid ${isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.16)'};
           border-radius: 9999px;
-          padding: 2px 7px 2px 3px;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+          padding: 2.5px 8px 2.5px 3.5px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.65);
           cursor: pointer;
           transform: translate(-50%, -50%) ${isSelected ? 'scale(1.15)' : 'scale(1)'};
-          transition: all 0.2s ease;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
           white-space: nowrap;
-          font-family: 'Outfit', sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
         ">
           <span style="
             background: ${badgeBg};
-            color: #070d13;
+            color: #FFFFFF;
             font-size: 11px;
-            font-weight: 800;
-            font-family: monospace;
+            font-weight: 700;
+            font-family: -apple-system, monospace;
             padding: 1px 5px;
             border-radius: 9999px;
             margin-right: 5px;
           ">${score.scoreFormatted}</span>
           <span style="
-            color: #f8fafc;
+            color: #FFFFFF;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             letter-spacing: -0.01em;
           ">${spot.name.split(' - ')[0]}</span>
-          ${isFavorite ? '<span style="color:#fbbf24;margin-left:4px;font-size:10px;">★</span>' : ''}
+          ${isFavorite ? '<span style="color:#FF9500;margin-left:4px;font-size:10px;">★</span>' : ''}
         </div>
       `;
 
@@ -150,51 +152,51 @@ export const SpotMap: React.FC<SpotMapProps> = ({
   };
 
   return (
-    <div className="relative w-full h-[68vh] min-h-[460px] max-h-[720px] rounded-2xl overflow-hidden border border-ocean-border shadow-xl flex flex-col">
+    <div className="relative w-full h-[68vh] min-h-[460px] max-h-[720px] rounded-3xl overflow-hidden border border-white/[0.1] shadow-2xl flex flex-col">
       
       {/* Conteneur Leaflet */}
       <div ref={mapContainerRef} className="flex-1 w-full h-full z-10" />
 
-      {/* Badge Côte Basque */}
-      <div className="absolute top-3 left-3 z-20 pointer-events-none bg-ocean-dark/95 backdrop-blur-md border border-ocean-border px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
-        <Compass className="w-4 h-4 text-wave-400 shrink-0 stroke-[2]" />
-        <span className="text-xs font-heading font-bold text-white uppercase tracking-wider">
+      {/* Badge Côte Basque style Apple Maps */}
+      <div className="absolute top-3 left-3 z-20 pointer-events-none bg-black/70 backdrop-blur-xl border border-white/[0.12] px-3.5 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+        <Compass className="w-4 h-4 text-[#0A84FF] shrink-0 stroke-[2.2]" />
+        <span className="text-xs font-semibold text-white tracking-normal">
           Spots Côte Basque (Anglet • Hendaye)
         </span>
       </div>
 
-      {/* Fiche d'action flottante sous la carte */}
+      {/* Fiche d'action flottante sous la carte façon Apple Maps Card */}
       {activeSpotData && (
-        <div className="absolute bottom-3 inset-x-3 sm:inset-x-6 z-20 bg-ocean-dark/95 backdrop-blur-md border border-ocean-border rounded-2xl p-3.5 sm:p-4 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-slide-up">
+        <div className="absolute bottom-3 inset-x-3 sm:inset-x-6 z-20 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/[0.12] rounded-3xl p-4 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 animate-slide-up">
           
           {/* Infos spot */}
           <div className="flex items-start justify-between sm:justify-start gap-3 min-w-0">
             <div className="space-y-0.5 min-w-0">
-              <div className="flex items-center gap-2 text-[11px] font-semibold text-wave-400 font-heading uppercase tracking-wider truncate">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#0A84FF] tracking-normal truncate">
                 <span>{activeSpotData.spot.town}</span>
-                <span className="text-slate-600">•</span>
-                <span className="truncate">{activeSpotData.spot.level}</span>
+                <span className="text-white/30">•</span>
+                <span className="truncate text-white/60 font-medium">{activeSpotData.spot.level}</span>
               </div>
-              <h4 className="font-heading font-bold text-white text-base sm:text-lg truncate">
+              <h4 className="font-bold text-white text-base sm:text-lg tracking-tight truncate">
                 {activeSpotData.spot.name}
               </h4>
-              <div className="flex items-center gap-1.5 text-xs text-slate-300">
-                <Clock className="w-3.5 h-3.5 text-wave-400 shrink-0 stroke-[2]" />
-                <span>Créneau : <strong className="text-white font-mono">{activeSpotData.score.bestWindowToday || 'Journée'}</strong></span>
+              <div className="flex items-center gap-1.5 text-xs text-white/70">
+                <Clock className="w-3.5 h-3.5 text-[#0A84FF] shrink-0 stroke-[2]" />
+                <span>Créneau : <strong className="text-white font-mono font-semibold">{activeSpotData.score.bestWindowToday || 'Journée'}</strong></span>
               </div>
             </div>
 
             {/* Note mobile */}
-            <div className="sm:hidden shrink-0 flex items-baseline gap-1 px-3 py-1 bg-ocean-card border border-ocean-border rounded-xl font-mono">
-              <span className="text-base font-extrabold text-wave-400">{activeSpotData.score.scoreFormatted}</span>
-              <span className="text-[10px] text-slate-400 font-bold">/10</span>
+            <div className="sm:hidden shrink-0 flex items-baseline gap-1 px-3 py-1 bg-white/[0.08] border border-white/[0.1] rounded-full font-mono">
+              <span className="text-base font-bold text-white">{activeSpotData.score.scoreFormatted}</span>
+              <span className="text-[10px] text-white/50 font-sans font-medium">/10</span>
             </div>
           </div>
 
           {/* Note desktop */}
-          <div className="hidden sm:flex items-center gap-1 px-3.5 py-1.5 bg-ocean-card border border-ocean-border rounded-xl font-mono shrink-0">
-            <span className="text-lg font-extrabold text-wave-400">{activeSpotData.score.scoreFormatted}</span>
-            <span className="text-xs text-slate-400 font-bold">/10</span>
+          <div className="hidden sm:flex items-center gap-1 px-3.5 py-1.5 bg-white/[0.08] border border-white/[0.1] rounded-full font-mono shrink-0">
+            <span className="text-lg font-bold text-white">{activeSpotData.score.scoreFormatted}</span>
+            <span className="text-xs text-white/50 font-sans font-medium">/10</span>
           </div>
 
           {/* Boutons d'action */}
@@ -203,27 +205,27 @@ export const SpotMap: React.FC<SpotMapProps> = ({
             {/* Favori */}
             <button
               onClick={() => onToggleFavorite(activeSpotData.spot.id)}
-              className="h-10 w-10 flex items-center justify-center rounded-xl bg-ocean-card border border-ocean-border text-slate-400 hover:text-amber-400 active:scale-95 transition"
+              className="h-10 w-10 flex items-center justify-center rounded-full bg-white/[0.08] border border-white/[0.1] text-white/60 hover:text-[#FF9500] active:scale-95 transition"
               aria-label="Favori"
             >
-              <Star className={`w-4 h-4 stroke-[1.8] ${activeSpotData.isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} />
+              <Star className={`w-4 h-4 stroke-[2] ${activeSpotData.isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
             </button>
 
             {/* Fiche & Marée */}
             <button
               onClick={() => onOpenDetails(activeSpotData.spot)}
-              className="h-10 px-3.5 rounded-xl bg-ocean-card hover:bg-ocean-hover border border-ocean-border text-slate-200 text-xs font-semibold flex items-center gap-1 active:scale-95 transition font-heading"
+              className="h-10 px-4 rounded-full bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.1] text-white text-xs font-semibold flex items-center gap-1.5 active:scale-95 transition"
             >
               <span>Marée & Fiche</span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-400 stroke-[2]" />
+              <ChevronRight className="w-3.5 h-3.5 text-white/60 stroke-[2.5]" />
             </button>
 
-            {/* Bouton GPS unique & puissant */}
+            {/* Bouton GPS unique & puissant façon Apple Maps */}
             <button
               onClick={() => openGPS(activeSpotData.spot.lat, activeSpotData.spot.lon, activeSpotData.spot.name)}
-              className="h-10 px-4 rounded-xl bg-wave-500 hover:bg-wave-400 text-ocean-dark text-xs font-heading font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition"
+              className="h-10 px-5 rounded-full bg-[#007AFF] hover:bg-[#0062cc] text-white text-xs font-semibold flex items-center gap-1.5 shadow-md active:scale-95 transition"
             >
-              <Navigation className="w-3.5 h-3.5 fill-ocean-dark stroke-ocean-dark" />
+              <Navigation className="w-3.5 h-3.5 fill-white stroke-white" />
               <span>Y aller</span>
             </button>
 

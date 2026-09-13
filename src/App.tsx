@@ -132,20 +132,20 @@ export const App: React.FC = () => {
   }, [selectedSpot, tidesByTown]);
 
   return (
-    <div className="min-h-screen bg-ocean-dark flex flex-col text-slate-100 selection:bg-wave-500 selection:text-ocean-dark font-sans">
+    <div className="min-h-screen bg-black flex flex-col text-white selection:bg-[#007AFF] selection:text-white font-sans antialiased">
       
-      {/* Barre supérieure ultra-fine : Marque + Marée live IFREMER/SHOM */}
+      {/* Barre supérieure iOS */}
       <Header tideData={activeHeaderTide} />
 
-      {/* Main Content avec padding-bottom suffisant pour le dock inférieur */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 pt-3 pb-28 sm:pb-32 space-y-2.5 sm:space-y-3">
+      {/* Main Content avec padding-bottom pour la barre flottante inférieure */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 pt-3 pb-32 sm:pb-36 space-y-3">
 
         {/* Dynamic View: Map or List */}
         {viewMode === 'map' ? (
           <section className="space-y-2">
-            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 font-heading">
-              <span>Carte interactive ({filteredSpots.length} spots)</span>
-              <span className="text-slate-500 font-mono">Anglet • Hendaye</span>
+            <div className="flex items-center justify-between text-xs text-white/50 px-1 font-medium">
+              <span>Carte des spots ({filteredSpots.length})</span>
+              <span className="text-white/40 font-mono">Anglet • Hendaye</span>
             </div>
 
             <SpotMap
@@ -157,35 +157,35 @@ export const App: React.FC = () => {
             />
           </section>
         ) : (
-          <section className="space-y-2">
-            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 font-heading">
+          <section className="space-y-2.5">
+            <div className="flex items-center justify-between text-xs text-white/50 px-1 font-medium">
               <span>
-                {filteredSpots.length} {filteredSpots.length > 1 ? 'spots classés par note' : 'spot'}
+                {filteredSpots.length} {filteredSpots.length > 1 ? 'spots classés par conditions' : 'spot'}
                 {selectedTown !== 'ALL' && ` à ${selectedTown}`}
                 {showFavoritesOnly && ' (favoris)'}
               </span>
-              <span className="text-slate-500 font-mono">
+              <span className="text-white/40 font-mono">
                 Marées IFREMER / SHOM
               </span>
             </div>
 
             {loading && Object.keys(tidesByTown).length === 0 ? (
-              <div className="py-16 text-center space-y-2">
-                <div className="w-6 h-6 border-2 border-wave-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                <p className="text-xs text-slate-400 font-heading">Chargement des marées...</p>
+              <div className="py-20 text-center space-y-2.5">
+                <div className="w-6 h-6 border-2 border-[#007AFF] border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-xs text-white/50 font-medium">Chargement des conditions...</p>
               </div>
             ) : filteredSpots.length === 0 ? (
-              <div className="py-12 text-center bg-ocean-card border border-ocean-border rounded-2xl p-6 space-y-2">
-                <AlertCircle className="w-8 h-8 text-slate-500 mx-auto stroke-[1.8]" />
-                <h3 className="text-sm font-heading font-semibold text-slate-200">Aucun spot trouvé</h3>
-                <p className="text-xs text-slate-400 max-w-xs mx-auto font-normal">
+              <div className="py-14 text-center bg-white/[0.04] border border-white/[0.08] rounded-3xl p-6 space-y-2">
+                <AlertCircle className="w-8 h-8 text-white/30 mx-auto stroke-[1.8]" />
+                <h3 className="text-sm font-semibold text-white">Aucun spot trouvé</h3>
+                <p className="text-xs text-white/50 max-w-xs mx-auto font-normal">
                   {showFavoritesOnly 
-                    ? "Ajoutez des spots en favoris en cliquant sur l'étoile pour les retrouver ici."
+                    ? "Ajoutez des spots en favoris pour les retrouver ici."
                     : "Essayez un autre mot clé ou sélectionnez une autre commune."}
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
                 {filteredSpots.map(({ spot, score, tide, isFavorite }, index) => (
                   <SpotCard
                     key={spot.id}
@@ -205,9 +205,9 @@ export const App: React.FC = () => {
 
       </main>
 
-      {/* Dock inférieur ergonomique (Thumb Zone pour smartphone) */}
-      <nav className="fixed bottom-0 inset-x-0 z-40 bg-ocean-dark/95 backdrop-blur-md border-t border-ocean-border pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(0,0,0,0.6)]">
-        <div className="max-w-5xl mx-auto px-3.5 sm:px-6">
+      {/* Barre d'action inférieure flottante style iOS Dock (Verre Dépoli Apple) */}
+      <nav className="fixed bottom-0 inset-x-0 z-40 bg-black/75 backdrop-blur-2xl border-t border-white/[0.1] pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <SearchBar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
@@ -222,17 +222,17 @@ export const App: React.FC = () => {
         </div>
       </nav>
 
-      {/* Clean Footer */}
-      <footer className="border-t border-ocean-border bg-ocean-dark/80 py-4 text-[11px] text-slate-400 mb-24 sm:mb-20">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left font-heading">
+      {/* Clean Apple Style Footer */}
+      <footer className="border-t border-white/[0.08] bg-black py-4 text-xs text-white/40 mb-24 sm:mb-20">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-ikurrina-red shadow-[0_0_8px_rgba(220,38,38,0.6)]"></span>
-            <span className="font-extrabold text-white tracking-wider">BASQUE SURF</span>
-            <span className="text-slate-600">•</span>
-            <span className="font-sans text-slate-400">Anglet à Hendaye</span>
+            <span className="w-2 h-2 rounded-full bg-[#dc2626] shadow-[0_0_6px_rgba(220,38,38,0.7)]"></span>
+            <span className="font-semibold text-white/90">BASQUE SURF</span>
+            <span className="text-white/20">•</span>
+            <span className="text-white/50">Anglet à Hendaye</span>
           </div>
 
-          <div className="text-slate-500 font-sans">
+          <div className="text-white/40">
             Données marées officielles CoefMarée (IFREMER / SHOM)
           </div>
         </div>

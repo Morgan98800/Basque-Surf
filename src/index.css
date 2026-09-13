@@ -11,7 +11,7 @@
   }
 
   html, body {
-    @apply bg-nautical-900 text-slate-100 min-h-screen font-sans;
+    @apply bg-black text-white min-h-screen font-sans;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
