@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, Navigation } from 'lucide-react';
+import { X, Star, AlertTriangle, Wind, Waves, Clock, Navigation } from 'lucide-react';
 import { openDirectMaps } from './GPSActionSheet';
 
 interface SpotDetailModalProps {
@@ -187,10 +187,11 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
         >
           
           {/* Main Score Hero Card */}
+          {/* Hero Score Card */}
           <div className="p-4 rounded-2xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-between gap-4">
             <div>
               <span className="text-xs text-white/50 block mb-0.5 font-medium">
-                {isToday ? 'Note de surf en direct' : 'Note prévisionnelle'}
+                {isToday ? 'Note du spot' : 'Prévision'}
               </span>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl sm:text-4xl font-bold text-white apple-score tracking-tight">{score.scoreFormatted}</span>
@@ -203,11 +204,11 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
 
             <div className="text-right text-xs space-y-1 text-white/80 font-medium">
               <div>
-                <span className="text-white/40">{scrubIndex !== null ? `Hauteur (${activeHourlyPoint.time}) : ` : (isToday ? "Hauteur d'eau : " : "Marée estimée : ")}</span>
+                <span className="text-white/40">{scrubIndex !== null ? `${activeHourlyPoint.time} : ` : 'Hauteur : '}</span>
                 <strong className="text-white apple-score text-sm">{activeHourlyPoint.height}m</strong>
               </div>
               <div>
-                <span className="text-white/40">Créneau idéal : </span>
+                <span className="text-white/40">Créneau : </span>
                 <strong className="text-[#30D158] apple-score font-bold">{score.bestWindowToday}</strong>
               </div>
             </div>
@@ -220,12 +221,6 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
               <span className="leading-snug font-medium">{score.warning}</span>
             </div>
           )}
-
-          {/* Diagnostic texte en casse naturelle */}
-          <div className="p-4 rounded-2xl bg-white/[0.06] border border-white/[0.08] text-white/80 leading-relaxed font-normal">
-            <span className="font-semibold text-white block mb-1 text-xs">Analyse des marées</span>
-            <p>{score.explanation}</p>
-          </div>
 
           {/* Courbe Continue Fluide façon Apple Météo avec Scrubbing */}
           <div className="space-y-2">
@@ -411,14 +406,6 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
                         );
                       })}
                     </svg>
-
-                    <div className="flex items-center justify-between text-[11px] text-white/55 mt-2 pt-2 border-t border-white/[0.06]">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-[#30D158]"></span>
-                        <span>Plage optimale ({spot.optimalTideRange.minHeight}m - {spot.optimalTideRange.maxHeight}m)</span>
-                      </div>
-                      <span className="text-white/40 text-[10px]">Glisser pour explorer la journée</span>
-                    </div>
                   </div>
                 );
               })()}
@@ -447,30 +434,16 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
               <span className="text-white font-semibold">{spot.bestSwell}</span>
             </div>
 
-            <div className="p-3 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
+            <div className="p-3 flex items-start justify-between gap-4">
+              <div className="flex items-center gap-2.5 shrink-0">
                 <div className="w-6 h-6 rounded-lg bg-[#FF9500]/20 flex items-center justify-center">
                   <Clock className="w-3.5 h-3.5 text-[#FF9500] stroke-[2]" />
                 </div>
-                <span className="text-white/60 font-medium">Marée requise</span>
+                <span className="text-white/60 font-medium">Marée</span>
               </div>
-              <span className="text-white font-semibold">{spot.tideDescription}</span>
-            </div>
-
-            <div className="p-3 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-[#AF52DE]/20 flex items-center justify-center">
-                  <Compass className="w-3.5 h-3.5 text-[#BF5AF2] stroke-[2]" />
-                </div>
-                <span className="text-white/60 font-medium">Niveau requis</span>
-              </div>
-              <span className="text-white font-semibold">{spot.level}</span>
+              <span className="text-white font-medium text-right leading-snug">{spot.tideDescription}</span>
             </div>
           </div>
-
-          <p className="text-xs text-white/50 leading-relaxed font-normal px-1">
-            {spot.description}
-          </p>
 
         </div>
 
