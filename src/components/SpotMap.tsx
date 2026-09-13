@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { Navigation, Star, Clock, ChevronRight, X, Waves } from 'lucide-react';
+import { Navigation, Star, Clock, ChevronRight, X } from 'lucide-react';
 import { openDirectMaps } from './GPSActionSheet';
 
 interface SpotMapProps {
@@ -273,21 +273,9 @@ export const SpotMap: React.FC<SpotMapProps> = ({
               <h4 className="font-bold text-white text-base sm:text-lg tracking-tight truncate">
                 {activeSpotData.spot.name}
               </h4>
-              <div className="flex items-center gap-2.5 text-xs text-white/70">
-                {activeSpotData.score.breakdown?.effectiveSwellHeight !== undefined && (
-                  <div className="flex items-center gap-1.5 shrink-0 px-2 py-0.5 rounded-lg bg-[#30B0C7]/15 border border-[#30B0C7]/30 text-[#4cd6ed]">
-                    <Waves className="w-3.5 h-3.5 text-[#30B0C7] shrink-0 stroke-[2.2]" />
-                    <span className="font-mono font-bold text-white text-xs">
-                      {activeSpotData.score.breakdown.effectiveSwellHeight < 0.25
-                        ? '< 0.3m'
-                        : `~${activeSpotData.score.breakdown.effectiveSwellHeight.toFixed(1)}m`}
-                    </span>
-                  </div>
-                )}
-                <div className="flex items-center gap-1.5 truncate">
-                  <Clock className="w-3.5 h-3.5 text-[#0A84FF] shrink-0 stroke-[2]" />
-                  <span className="truncate">Créneau : <strong className="text-white font-mono font-semibold">{activeSpotData.score.bestWindowToday || 'Journée'}</strong></span>
-                </div>
+              <div className="flex items-center gap-1.5 text-xs text-white/70">
+                <Clock className="w-3.5 h-3.5 text-[#0A84FF] shrink-0 stroke-[2]" />
+                <span>Créneau : <strong className="text-white font-mono font-semibold">{activeSpotData.score.bestWindowToday || 'Journée'}</strong></span>
               </div>
             </div>
 
