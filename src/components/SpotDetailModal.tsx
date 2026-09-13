@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, Navigation, ChevronDown } from 'lucide-react';
-import { GPSActionSheet, getSavedGPSPreference, openGPSUrl, GPSProvider } from './GPSActionSheet';
+import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, Navigation } from 'lucide-react';
+import { openDirectMaps } from './GPSActionSheet';
 
 interface SpotDetailModalProps {
   spot: Spot | null;
@@ -22,8 +22,6 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   onToggleFavorite,
   onClose,
 }) => {
-  const [showGPSChoice, setShowGPSChoice] = useState(false);
-  const [gpsPref, setGpsPref] = useState<GPSProvider | null>(getSavedGPSPreference);
   const [scrubIndex, setScrubIndex] = useState<number | null>(null);
 
   // Recul de la vue parente façon iOS 18
@@ -48,14 +46,6 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   const activeHourIndex = scrubIndex !== null ? scrubIndex : (isToday ? Math.min(23, currentHour) : 12);
   const activeHourlyPoint = tide.hourlyCurve[activeHourIndex] || tide.hourlyCurve[0];
 
-  // Ouvre l'application GPS préférée ou affiche le choix
-  const handleOpenGPS = () => {
-    if (gpsPref) {
-      openGPSUrl(gpsPref, spot.lat, spot.lon, spot.name);
-    } else {
-      setShowGPSChoice(true);
-    }
-  };
 
   return (
     <div 
@@ -85,18 +75,18 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => onToggleFavorite(spot.id)}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.12] text-white/60 hover:text-[#FF9500] active:scale-95 transition"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white/60 hover:text-[#FF9500] active:scale-90 transition"
               aria-label="Favori"
             >
-              <Star className={`w-4 h-4 stroke-[2] ${isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
+              <Star className={`w-4.5 h-4.5 stroke-[2] ${isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
             </button>
 
             <button
               onClick={onClose}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.12] text-white/60 hover:text-white active:scale-95 transition"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white/60 hover:text-white active:scale-90 transition"
               aria-label="Fermer"
             >
-              <X className="w-4 h-4 stroke-[2]" />
+              <X className="w-4.5 h-4.5 stroke-[2.2]" />
             </button>
           </div>
         </div>
@@ -392,47 +382,18 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
 
         </div>
 
-        {/* Bottom Action: Bouton Apple Style avec choix de l'application préférée et Safe Area iOS */}
+        {/* Bottom Action: Bouton Pleine Largeur Style Apple Plans */}
         <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-white/[0.08] bg-[#161618]">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleOpenGPS}
-              className="flex-1 h-11 px-5 rounded-full bg-[#007AFF] hover:bg-[#0062cc] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition shadow-md"
-            >
-              <Navigation className="w-4 h-4 fill-white stroke-white" />
-              <span>
-                {gpsPref === 'google' 
-                  ? 'Itinéraire Google Maps' 
-                  : gpsPref === 'waze' 
-                  ? 'Itinéraire Waze' 
-                  : gpsPref === 'apple' 
-                  ? 'Itinéraire Apple Plans' 
-                  : 'Itinéraire GPS'}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setShowGPSChoice(true)}
-              className="h-11 px-3.5 rounded-full bg-white/[0.08] hover:bg-white/[0.12] text-white/70 hover:text-white border border-white/[0.1] text-xs font-semibold flex items-center gap-1 transition active:scale-95 shrink-0"
-              title="Changer d'application de navigation (Google Maps, Apple Plans, Waze)"
-            >
-              <span>{gpsPref ? 'Changer' : 'Choisir'}</span>
-              <ChevronDown className="w-3.5 h-3.5 stroke-[2]" />
-            </button>
-          </div>
+          <button
+            onClick={() => openDirectMaps(spot.lat, spot.lon, spot.name)}
+            className="w-full h-12 px-6 rounded-2xl bg-[#007AFF] hover:bg-[#0062cc] active:scale-[0.985] text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition shadow-[0_4px_20px_rgba(0,122,255,0.35)]"
+          >
+            <Navigation className="w-4.5 h-4.5 fill-white stroke-white" />
+            <span>Itinéraire</span>
+          </button>
         </div>
 
       </div>
-
-      {/* Action Sheet iOS pour le choix du GPS */}
-      <GPSActionSheet
-        isOpen={showGPSChoice}
-        onClose={() => setShowGPSChoice(false)}
-        lat={spot.lat}
-        lon={spot.lon}
-        spotName={spot.name}
-        onPreferenceChange={(p) => setGpsPref(p)}
-      />
 
     </div>
   );

@@ -44,6 +44,31 @@ export function openGPSUrl(provider: GPSProvider, lat: number, lon: number, name
   }
 }
 
+/**
+ * Ouvre directement l'application de navigation préférée du téléphone (Apple Plans sur iOS,
+ * intent geo sur Android, Google Maps sur desktop), ou celle choisie par l'utilisateur.
+ */
+export function openDirectMaps(lat: number, lon: number, name: string) {
+  const saved = getSavedGPSPreference();
+  if (saved) {
+    openGPSUrl(saved, lat, lon, name);
+    return;
+  }
+
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+  const isIOS = /iPhone|iPad|iPod/i.test(ua) || (typeof navigator !== 'undefined' && navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/i.test(ua);
+  const encodedName = encodeURIComponent(name);
+
+  if (isIOS) {
+    window.open(`maps://maps.apple.com/?daddr=${lat},${lon}&q=${encodedName}&dirflg=d`, '_blank');
+  } else if (isAndroid) {
+    window.open(`geo:${lat},${lon}?q=${lat},${lon}(${encodedName})`, '_blank');
+  } else {
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
+  }
+}
+
 interface GPSActionSheetProps {
   isOpen: boolean;
   onClose: () => void;

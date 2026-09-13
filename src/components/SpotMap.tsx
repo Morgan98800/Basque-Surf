@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { Spot, SpotScore, TideData } from '../types/index';
 import { Navigation, Star, Clock, ChevronRight } from 'lucide-react';
-import { GPSActionSheet, getSavedGPSPreference, openGPSUrl, GPSProvider } from './GPSActionSheet';
+import { openDirectMaps } from './GPSActionSheet';
 
 interface SpotMapProps {
   spots: Array<{ spot: Spot; score: SpotScore; tide: TideData; isFavorite: boolean }>;
@@ -151,18 +151,11 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     }
   }, [selectedSpot]);
 
-  const [showGPSChoice, setShowGPSChoice] = useState(false);
-  const [gpsPref, setGpsPref] = useState<GPSProvider | null>(getSavedGPSPreference);
-
   const activeSpotData = spots.find((s) => s.spot.id === selectedSpot?.id) || spots[0];
 
   const handleOpenGPS = () => {
     if (!activeSpotData) return;
-    if (gpsPref) {
-      openGPSUrl(gpsPref, activeSpotData.spot.lat, activeSpotData.spot.lon, activeSpotData.spot.name);
-    } else {
-      setShowGPSChoice(true);
-    }
+    openDirectMaps(activeSpotData.spot.lat, activeSpotData.spot.lon, activeSpotData.spot.name);
   };
 
   return (
@@ -220,57 +213,37 @@ export const SpotMap: React.FC<SpotMapProps> = ({
           {/* Boutons d'action adaptés mobile & desktop */}
           <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
             
-            {/* Favori */}
+            {/* Favori (44x44px Apple HIG) */}
             <button
               onClick={() => onToggleFavorite(activeSpotData.spot.id)}
-              className="h-10 w-10 shrink-0 flex items-center justify-center rounded-full bg-white/[0.08] border border-white/[0.1] text-white/60 hover:text-[#FF9500] active:scale-95 transition"
+              className="h-11 w-11 shrink-0 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.1] text-white/60 hover:text-[#FF9500] active:scale-95 transition"
               aria-label="Favori"
             >
               <Star className={`w-4 h-4 stroke-[2] ${activeSpotData.isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
             </button>
 
-            {/* Fiche & Marée */}
+            {/* Fiche & Marée (44px Apple HIG) */}
             <button
               onClick={() => onOpenDetails(activeSpotData.spot)}
-              className="flex-1 sm:flex-initial h-10 px-3.5 sm:px-4 rounded-full bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.1] text-white text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition"
+              className="flex-1 sm:flex-initial h-11 px-4 sm:px-5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.1] text-white text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition"
             >
               <span>Fiche</span>
               <ChevronRight className="w-3.5 h-3.5 text-white/60 stroke-[2.5]" />
             </button>
 
-            {/* Bouton GPS vers l'app préférée (Google Maps, Apple Plans, Waze) */}
+            {/* Bouton GPS direct (44px Apple HIG) */}
             <button
               onClick={handleOpenGPS}
-              className="flex-1 sm:flex-initial h-10 px-4 sm:px-5 rounded-full bg-[#007AFF] hover:bg-[#0062cc] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition"
-              title="Lancer l'itinéraire dans votre application préférée"
+              className="flex-1 sm:flex-initial h-11 px-5 sm:px-6 rounded-full bg-[#007AFF] hover:bg-[#0062cc] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition"
+              title="Lancer l'itinéraire"
             >
               <Navigation className="w-3.5 h-3.5 fill-white stroke-white" />
-              <span>
-                {gpsPref === 'google' 
-                  ? 'Google Maps' 
-                  : gpsPref === 'waze' 
-                  ? 'Waze' 
-                  : gpsPref === 'apple' 
-                  ? 'Apple Plans' 
-                  : 'Y aller'}
-              </span>
+              <span>Y aller</span>
             </button>
 
           </div>
 
         </div>
-      )}
-
-      {/* Action Sheet pour choisir l'application de navigation */}
-      {activeSpotData && (
-        <GPSActionSheet
-          isOpen={showGPSChoice}
-          onClose={() => setShowGPSChoice(false)}
-          lat={activeSpotData.spot.lat}
-          lon={activeSpotData.spot.lon}
-          spotName={activeSpotData.spot.name}
-          onPreferenceChange={(p) => setGpsPref(p)}
-        />
       )}
 
     </div>
