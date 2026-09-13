@@ -46,3 +46,16 @@ button, a {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Suppression totale du badge / HUD Netlify */
+#nl-hud-frame,
+#nl-badge-frame,
+iframe[src*="netlify"],
+iframe[id^="nl-"],
+[class*="netlify-identity"],
+[id*="netlify"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
