@@ -10,35 +10,17 @@
     <title>Basque Surf | Marées & Spots de la Côte Basque</title>
     <meta name="description" content="Conditions de surf et marées officielles IFREMER/SHOM en direct sur la Côte Basque : Anglet, Biarritz, Bidart, Guéthary, Saint-Jean-de-Luz, Hendaye." />
     
-    <!-- Neutralisation du badge / HUD Netlify -->
+    <!-- Masquage propre du badge Netlify -->
     <script>
       try {
         localStorage.setItem("nl-hud:public:v1", "hidden");
         localStorage.setItem("nl-hud:owner-private:v1", "hidden");
       } catch (e) {}
-
-      // Suppression immédiate de tout élément injecté par Netlify
-      const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-          for (const node of mutation.addedNodes) {
-            if (node.nodeType === 1) {
-              const el = node;
-              if (
-                el.id === 'nl-hud-frame' ||
-                el.id === 'nl-badge-frame' ||
-                (el.tagName === 'SCRIPT' && el.src && el.src.includes('netlify')) ||
-                (el.tagName === 'IFRAME' && el.id && el.id.startsWith('nl-'))
-              ) {
-                el.remove();
-              }
-            }
-          }
-        }
-      });
-      observer.observe(document.documentElement, { childList: true, subtree: true });
     </script>
     <style>
-      #nl-hud-frame, #nl-badge-frame, iframe[id^="nl-"], [data-netlify-deploy] {
+      #nl-hud-frame,
+      #nl-badge-frame,
+      iframe[id^="nl-"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
