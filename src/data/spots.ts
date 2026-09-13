@@ -1,0 +1,462 @@
+import { Spot, BasqueTown } from '../types/index';
+
+export const BASQUE_SPOTS: Spot[] = [
+  // --- ANGLET ---
+  {
+    id: 'anglet-cavaliers',
+    name: 'Les Cavaliers',
+    town: 'Anglet',
+    type: 'beach_break',
+    level: 'Confirmé',
+    optimalTideRange: {
+      minHeight: 1.2,
+      maxHeight: 2.8,
+      preferredPhases: ['incoming', 'outgoing', 'low']
+    },
+    tideDescription: 'Marée basse à mi-marée. À marée haute, les vagues saturent ou ferment brutalement.',
+    hazards: 'Forts courants de baïne, shorebreak puissant, localisme courtois.',
+    bestWind: 'Est / Sud-Est (Offshore)',
+    bestSwell: 'Ouest / Nord-Ouest 1m à 2.2m',
+    description: 'Le spot de beach-break réputé mondialement pour ses tubes creux et puissants le long des épis.',
+    lat: 43.5242,
+    lon: -1.5303
+  },
+  {
+    id: 'anglet-chambre-amour',
+    name: "La Chambre d'Amour (VVF)",
+    town: 'Anglet',
+    type: 'beach_break',
+    level: 'Intermédiaire',
+    optimalTideRange: {
+      minHeight: 1.4,
+      maxHeight: 3.1,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée montante idéale. Abrité du vent de sud par la falaise du phare de Biarritz.',
+    hazards: 'Rochers sous le phare, baïnes marquées.',
+    bestWind: 'Sud / Sud-Est',
+    bestSwell: 'Nord-Ouest / Ouest 1m à 2m',
+    description: 'Niché au pied de la falaise du phare de Biarritz, offre de jolies gauches et droites plus calmes.',
+    lat: 43.5025,
+    lon: -1.5428
+  },
+  {
+    id: 'anglet-marinella',
+    name: 'Marinella',
+    town: 'Anglet',
+    type: 'beach_break',
+    level: 'Tous niveaux',
+    optimalTideRange: {
+      minHeight: 1.5,
+      maxHeight: 3.2,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée idéale. Les bancs de sable y sont généralement doux et bien répartis.',
+    hazards: 'Affluence estivale, baïnes.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest 0.8m à 1.8m',
+    description: 'Plage très conviviale et polyvalente, idéale pour progresser ou surfer en shortboard / longboard.',
+    lat: 43.5086,
+    lon: -1.5383
+  },
+  {
+    id: 'anglet-corsaires',
+    name: 'Les Corsaires',
+    town: 'Anglet',
+    type: 'beach_break',
+    level: 'Intermédiaire',
+    optimalTideRange: {
+      minHeight: 1.3,
+      maxHeight: 2.9,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Basse à mi-marée. Attention au shorebreak à marée haute.',
+    hazards: 'Courant de vidange près des digues.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest 1m à 2m',
+    description: 'Beach-break encadré par des digues rocheuses qui canalisent de belles sections dynamiques.',
+    lat: 43.5115,
+    lon: -1.5365
+  },
+  {
+    id: 'anglet-madrague',
+    name: 'La Madrague',
+    town: 'Anglet',
+    type: 'beach_break',
+    level: 'Intermédiaire',
+    optimalTideRange: {
+      minHeight: 1.3,
+      maxHeight: 3.0,
+      preferredPhases: ['incoming', 'low', 'outgoing']
+    },
+    tideDescription: 'Basse à mi-marée. Espace large avec de multiples pics.',
+    hazards: 'Courants latéraux.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest 1m à 2m',
+    description: 'Grande plage ouverte offrant de multiples pics pour répartir les surfeurs.',
+    lat: 43.5181,
+    lon: -1.5336
+  },
+  {
+    id: 'anglet-la-barre',
+    name: 'La Barre',
+    town: 'Anglet',
+    type: 'beach_break',
+    level: 'Tous niveaux',
+    optimalTideRange: {
+      minHeight: 1.8,
+      maxHeight: 3.6,
+      preferredPhases: ['incoming', 'high']
+    },
+    tideDescription: 'Mi-marée à marée haute. Spot de repli par forte houle.',
+    hazards: 'Courant puissant de l’embouchure de l’Adour.',
+    bestWind: 'Sud / Sud-Est',
+    bestSwell: 'Grosse houle Ouest / Nord-Ouest > 2.5m',
+    description: 'Spot historique du surf français, aujourd’hui spot de repli protégé quand l’océan sature ailleurs.',
+    lat: 43.5302,
+    lon: -1.5244
+  },
+
+  // --- BIARRITZ ---
+  {
+    id: 'biarritz-cote-des-basques',
+    name: 'Côte des Basques',
+    town: 'Biarritz',
+    type: 'beach_break',
+    level: 'Tous niveaux',
+    highTideRisk: true,
+    optimalTideRange: {
+      minHeight: 0.8,
+      maxHeight: 2.7,
+      preferredPhases: ['low', 'incoming', 'outgoing']
+    },
+    tideDescription: 'MARÉE BASSE À MI-MARÉE SEULEMENT. À marée haute, les vagues heurtent directement la digue et la falaise (accès impossible et dangereux).',
+    hazards: 'DANGER : Disparition totale de la plage à marée haute, shorebreak sur la falaise de pierre, escaliers glissants.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest / Nord-Ouest 0.8m à 2m',
+    description: 'Le berceau du surf européen ! Cadre exceptionnel avec vue sur la Villa Belza et la côte espagnole. Paradis des longboarders.',
+    lat: 43.4776,
+    lon: -1.5694
+  },
+  {
+    id: 'biarritz-grande-plage',
+    name: 'Grande Plage',
+    town: 'Biarritz',
+    type: 'beach_break',
+    level: 'Intermédiaire',
+    optimalTideRange: {
+      minHeight: 1.4,
+      maxHeight: 3.2,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée. À marée basse le plan d’eau peut être plat ou fermer ; à marée haute, puissant shorebreak sur le sable incliné.',
+    hazards: 'Rochers immergés au nord et sud, baigneurs en saison, shorebreak violent à marée haute.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest / Nord-Ouest 1m à 1.8m',
+    description: 'Au cœur de la ville impériale entre le Casino et l’Hôtel du Palais, vagues rapides et dynamiques.',
+    lat: 43.4851,
+    lon: -1.5583
+  },
+  {
+    id: 'biarritz-miramar',
+    name: 'Miramar',
+    town: 'Biarritz',
+    type: 'beach_break',
+    level: 'Confirmé',
+    optimalTideRange: {
+      minHeight: 1.5,
+      maxHeight: 3.0,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée montante. Les vagues déroulent devant la roche de la Frégate.',
+    hazards: 'Rochers très coupants, courants violents.',
+    bestWind: 'Sud / Est',
+    bestSwell: 'Ouest 1m à 2m',
+    description: 'Petite plage au nord de la Grande Plage, plus sauvage avec un pic technique apprécié des bodyboarders et shortboards.',
+    lat: 43.4883,
+    lon: -1.5539
+  },
+  {
+    id: 'biarritz-marbella',
+    name: 'Marbella',
+    town: 'Biarritz',
+    type: 'beach_break',
+    level: 'Confirmé',
+    optimalTideRange: {
+      minHeight: 1.2,
+      maxHeight: 2.8,
+      preferredPhases: ['low', 'incoming', 'outgoing']
+    },
+    tideDescription: 'Marée basse à mi-marée. À marée basse, attention aux cailloux affleurants.',
+    hazards: 'Rochers sous l’eau, courants forts.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest 1m à 2.2m',
+    description: 'Prolongement sauvage de la Côte des Basques, vagues plus puissantes et plus creuses sur fond mixte sable et roches.',
+    lat: 43.4716,
+    lon: -1.5727
+  },
+  {
+    id: 'biarritz-milady',
+    name: 'La Milady',
+    town: 'Biarritz',
+    type: 'beach_break',
+    level: 'Intermédiaire',
+    optimalTideRange: {
+      minHeight: 1.4,
+      maxHeight: 2.9,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée. Shorebreak très agressif à marée haute.',
+    hazards: 'Shorebreak violent au bord, rochers sur les côtés.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest 1m à 2m',
+    description: 'Grande plage familiale avec promenade, proposant un beach-break rapide et tonique.',
+    lat: 43.4678,
+    lon: -1.5746
+  },
+
+  // --- BIDART ---
+  {
+    id: 'bidart-ilbarritz',
+    name: 'Ilbarritz',
+    town: 'Bidart',
+    type: 'beach_break',
+    level: 'Tous niveaux',
+    optimalTideRange: {
+      minHeight: 1.3,
+      maxHeight: 3.1,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée montante idéale. Fonctionne bien sans trop saturer.',
+    hazards: 'Roches sur les extrémités de plage.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest 1m à 1.8m',
+    description: 'Spot somptueux surplombé par le château d’Ilbarritz, parfait pour une session décontractée.',
+    lat: 43.4578,
+    lon: -1.5786
+  },
+  {
+    id: 'bidart-erretegia',
+    name: 'Erretegia',
+    town: 'Bidart',
+    type: 'beach_break',
+    level: 'Intermédiaire',
+    optimalTideRange: {
+      minHeight: 1.3,
+      maxHeight: 2.9,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée montante. Espace réduit à marée très haute.',
+    hazards: 'Fonds rocheux disséminés, accès en pente raide.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest 1m à 2m',
+    description: 'Crique naturelle préservée au pied de falaises verdoyantes, vague authentique et cadre sauvage.',
+    lat: 43.4475,
+    lon: -1.5912
+  },
+  {
+    id: 'bidart-centre',
+    name: 'Bidart Centre',
+    town: 'Bidart',
+    type: 'beach_break',
+    level: 'Tous niveaux',
+    optimalTideRange: {
+      minHeight: 1.4,
+      maxHeight: 3.0,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée. À marée haute, la vague casse près des enrochements.',
+    hazards: 'Enrochements et digue.',
+    bestWind: 'Est',
+    bestSwell: 'Ouest 1m à 1.8m',
+    description: 'Plage centrale accessible depuis le village basque typique de Bidart, plusieurs pics accessibles.',
+    lat: 43.4402,
+    lon: -1.5971
+  },
+  {
+    id: 'bidart-uhabia',
+    name: 'Uhabia',
+    town: 'Bidart',
+    type: 'beach_break',
+    level: 'Intermédiaire',
+    optimalTideRange: {
+      minHeight: 1.2,
+      maxHeight: 2.8,
+      preferredPhases: ['low', 'incoming']
+    },
+    tideDescription: 'Marée basse à mi-marée montante.',
+    hazards: 'Embouchure de rivière, courant sortant.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest 1m à 2m',
+    description: 'Bancs de sable alimentés par la rivière de l’Uhabia, offrant parfois de jolis bancs calés.',
+    lat: 43.4338,
+    lon: -1.6033
+  },
+
+  // --- GUÉTHARY ---
+  {
+    id: 'guethary-parlementia',
+    name: 'Parlementia',
+    town: 'Guéthary',
+    type: 'reef_break',
+    level: 'Confirmé',
+    optimalTideRange: {
+      minHeight: 1.8,
+      maxHeight: 3.8,
+      preferredPhases: ['incoming', 'high', 'outgoing']
+    },
+    tideDescription: 'Mi-marée à marée haute. À marée basse, le récif est affleurant et la rame est longue.',
+    hazards: 'Dalles de rochers plates, longue rame au large (300m), puissance par grosse houle.',
+    bestWind: 'Sud / Est / Sud-Est',
+    bestSwell: 'Ouest / Nord-Ouest 1.5m à 4m+',
+    description: 'L’un des reefs de gros les plus célèbres d’Europe. Une droite majestueuse qui tient la houle jusqu’à plus de 5 mètres.',
+    lat: 43.4258,
+    lon: -1.6112
+  },
+  {
+    id: 'guethary-cenitz',
+    name: 'Cenitz',
+    town: 'Guéthary',
+    type: 'reef_break',
+    level: 'Intermédiaire',
+    optimalTideRange: {
+      minHeight: 2.0,
+      maxHeight: 3.6,
+      preferredPhases: ['incoming', 'high']
+    },
+    tideDescription: 'Mi-marée montante à marée haute. À marée basse, trop de cailloux découverts.',
+    hazards: 'Platier rocheux, oursins, cailloux ronds glissants.',
+    bestWind: 'Sud / Sud-Est',
+    bestSwell: 'Ouest 1m à 2.2m',
+    description: 'Baie classée espace naturel. Offre une longue droite au fond pour les longboards et une gauche plus creuse sur la plage.',
+    lat: 43.4192,
+    lon: -1.6174
+  },
+  {
+    id: 'guethary-alcyons',
+    name: 'Les Alcyons',
+    town: 'Guéthary',
+    type: 'reef_break',
+    level: 'Expert',
+    optimalTideRange: {
+      minHeight: 1.0,
+      maxHeight: 2.4,
+      preferredPhases: ['low', 'incoming']
+    },
+    tideDescription: 'Marée basse à mi-marée montante.',
+    hazards: 'Dalle de roche très peu profonde, vague creuse et rapide.',
+    bestWind: 'Est / Sud-Est',
+    bestSwell: 'Ouest 1.5m à 2.5m',
+    description: 'Reef break de gauche court, rapide et très technique réservé aux surfeurs aguerris.',
+    lat: 43.4241,
+    lon: -1.6091
+  },
+
+  // --- SAINT-JEAN-DE-LUZ ---
+  {
+    id: 'st-jean-lafitenia',
+    name: 'Lafitenia',
+    town: 'Saint-Jean-de-Luz',
+    type: 'point_break',
+    level: 'Confirmé',
+    optimalTideRange: {
+      minHeight: 1.1,
+      maxHeight: 2.7,
+      preferredPhases: ['low', 'incoming']
+    },
+    tideDescription: 'MARÉE BASSE À MI-MARÉE MONTANTE. À marée haute, la vague devient molle et disparaît sur les falaises.',
+    hazards: 'Fond rocheux irrégulier, oursins, mise à l’eau sur les galets, fort monde au pic.',
+    bestWind: 'Sud / Sud-Est / Est',
+    bestSwell: 'Nord-Ouest / Ouest 1.2m à 3m',
+    description: 'Le joyau basque ! Point break de droite parfait déroulant sur plusieurs centaines de mètres le long de la falaise.',
+    lat: 43.4144,
+    lon: -1.6258
+  },
+  {
+    id: 'st-jean-erromardie',
+    name: 'Erromardie',
+    town: 'Saint-Jean-de-Luz',
+    type: 'reef_break',
+    level: 'Intermédiaire',
+    optimalTideRange: {
+      minHeight: 1.5,
+      maxHeight: 3.1,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée. À marée trop basse, les roches sont trop proches de la surface.',
+    hazards: 'Dalle rocheuse au bord, galets.',
+    bestWind: 'Sud / Sud-Est',
+    bestSwell: 'Ouest 1m à 2m',
+    description: 'Jolie baie protégée avec un pic de gauche et de droite sur fond mixte galets/roches.',
+    lat: 43.4075,
+    lon: -1.6386
+  },
+  {
+    id: 'st-jean-sainte-barbe',
+    name: 'Sainte-Barbe / Baie',
+    town: 'Saint-Jean-de-Luz',
+    type: 'point_break',
+    level: 'Tous niveaux',
+    optimalTideRange: {
+      minHeight: 2.2,
+      maxHeight: 4.0,
+      preferredPhases: ['incoming', 'high']
+    },
+    tideDescription: 'Marée haute et gros coefficients. Ne fonctionne que par forte tempête.',
+    hazards: 'Digue en béton, surfeurs nombreux lors des gros swells.',
+    bestWind: 'Sud / Ouest abrité',
+    bestSwell: 'Grosse houle Ouest / Nord-Ouest > 3m',
+    description: 'Spot de repli absolu ! Quand la côte est déchaînée et impraticable, une droite magique et abritée se lève au fond de la baie.',
+    lat: 43.3986,
+    lon: -1.6622
+  },
+
+  // --- HENDAYE ---
+  {
+    id: 'hendaye-plage',
+    name: 'Hendaye - Les Deux Jumeaux',
+    town: 'Hendaye',
+    type: 'beach_break',
+    level: 'Tous niveaux',
+    optimalTideRange: {
+      minHeight: 1.0,
+      maxHeight: 3.8,
+      preferredPhases: ['incoming', 'low', 'outgoing', 'high']
+    },
+    tideDescription: 'Fonctionne à TOUTES LES MARÉES, optimale à mi-marée montante.',
+    hazards: 'Très peu de dangers, pente très douce. Idéal débutants.',
+    bestWind: 'Sud / Sud-Est / Est',
+    bestSwell: 'Ouest / Nord-Ouest 1.2m à 3.5m',
+    description: 'La plus grande plage de la Côte Basque française, abritée dans la baie de Chingoudy. Le paradis des débutants et le spot de repli ultime quand la côte sature.',
+    lat: 43.3742,
+    lon: -1.7711
+  },
+  {
+    id: 'hendaye-casino',
+    name: 'Hendaye - Le Casino',
+    town: 'Hendaye',
+    type: 'beach_break',
+    level: 'Débutant',
+    optimalTideRange: {
+      minHeight: 1.2,
+      maxHeight: 3.5,
+      preferredPhases: ['incoming', 'outgoing']
+    },
+    tideDescription: 'Mi-marée montante. Vagues longues et faciles.',
+    hazards: 'Zone de baignade.',
+    bestWind: 'Sud / Est',
+    bestSwell: 'Ouest 1m à 2.5m',
+    description: 'Au centre de la promenade hendayaise, vagues douces et sécurisantes pour apprendre et progresser sans stress.',
+    lat: 43.3725,
+    lon: -1.7803
+  }
+];
+
+export const BASQUE_TOWNS: BasqueTown[] = [
+  'Anglet',
+  'Biarritz',
+  'Bidart',
+  'Guéthary',
+  'Saint-Jean-de-Luz',
+  'Hendaye'
+];
