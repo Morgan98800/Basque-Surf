@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { Navigation, Star, Clock, ChevronRight } from 'lucide-react';
+import { Navigation, Star, Clock, ChevronRight, X } from 'lucide-react';
 import { openDirectMaps } from './GPSActionSheet';
 
 interface SpotMapProps {
   spots: Array<{ spot: Spot; score: SpotScore; tide: TideData; isFavorite: boolean }>;
   selectedSpot: Spot | null;
-  onSelectSpot: (spot: Spot) => void;
+  onSelectSpot: (spot: Spot | null) => void;
   onOpenDetails: (spot: Spot) => void;
   onToggleFavorite: (spotId: string) => void;
 }
@@ -59,13 +59,18 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       setCurrentZoom(map.getZoom());
     });
 
+    // Clic sur fond de carte pour fermer la fiche / désélectionner
+    map.on('click', () => {
+      onSelectSpot(null);
+    });
+
     mapInstanceRef.current = map;
 
     return () => {
       map.remove();
       mapInstanceRef.current = null;
     };
-  }, []);
+  }, [onSelectSpot]);
 
   // Mise à jour des marqueurs avec dé-encombrement intelligent
   useEffect(() => {
@@ -132,7 +137,8 @@ export const SpotMap: React.FC<SpotMapProps> = ({
 
       const marker = L.marker([spot.lat, spot.lon], { icon: customIcon });
       
-      marker.on('click', () => {
+      marker.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
         onSelectSpot(spot);
         map.panTo([spot.lat, spot.lon], { animate: true, duration: 0.4 });
       });
@@ -151,7 +157,8 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     }
   }, [selectedSpot]);
 
-  const activeSpotData = spots.find((s) => s.spot.id === selectedSpot?.id) || spots[0];
+  // Seul un spot expressément sélectionné affiche la fiche flottante (jamais par défaut au chargement)
+  const activeSpotData = selectedSpot ? (spots.find((s) => s.spot.id === selectedSpot.id) || null) : null;
 
   const handleOpenGPS = () => {
     if (!activeSpotData) return;
@@ -176,12 +183,25 @@ export const SpotMap: React.FC<SpotMapProps> = ({
         </div>
       )}
 
-      {/* Fiche d'action flottante sous la carte façon Apple Maps Card */}
+      {/* Fiche d'action flottante sous la carte (affichée uniquement au clic sur un marqueur) */}
       {activeSpotData && (
         <div className="absolute bottom-3 inset-x-3 sm:inset-x-6 z-20 bg-[#1c1c1e]/95 backdrop-blur-2xl border border-white/[0.14] rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-slide-up">
           
+          {/* Bouton Fermer le pop up */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectSpot(null);
+            }}
+            className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition"
+            aria-label="Fermer la fiche du spot"
+          >
+            <X className="w-3.5 h-3.5 stroke-[2.5]" />
+          </button>
+
           {/* Infos spot */}
-          <div className="flex items-start justify-between sm:justify-start gap-3 min-w-0">
+          <div className="flex items-start justify-between sm:justify-start gap-3 min-w-0 pr-8 sm:pr-0">
             <div className="space-y-0.5 min-w-0">
               <div className="flex items-center gap-2 text-xs font-semibold text-[#0A84FF] tracking-normal truncate">
                 <span>{activeSpotData.spot.town}</span>

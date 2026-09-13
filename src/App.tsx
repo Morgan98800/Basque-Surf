@@ -33,8 +33,11 @@ export const App: React.FC = () => {
   const [selectedTown, setSelectedTown] = useState<BasqueTown | 'ALL'>('ALL');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState<boolean>(false);
 
-  // Spot sélectionné pour Bottom Sheet ou Carte
-  const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
+  // Spot affiché dans la fiche détaillée (Modale / Bottom Sheet)
+  const [modalSpot, setModalSpot] = useState<Spot | null>(null);
+
+  // Spot sélectionné sur la carte (Marqueur en surbrillance + Fiche d'action map)
+  const [mapSelectedSpot, setMapSelectedSpot] = useState<Spot | null>(null);
 
   // Favoris persistants
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -59,7 +62,10 @@ export const App: React.FC = () => {
       const urlSpot = params.get('spot');
       if (urlSpot) {
         const found = BASQUE_SPOTS.find((s) => s.id === urlSpot);
-        if (found) setSelectedSpot(found);
+        if (found) {
+          setMapSelectedSpot(found);
+          setModalSpot(found);
+        }
       }
     } catch {}
   }, []);
@@ -175,11 +181,6 @@ export const App: React.FC = () => {
       });
   }, [spotsWithScores, searchTerm, selectedTown, showFavoritesOnly]);
 
-  const selectedSpotTide = useMemo(() => {
-    if (!selectedSpot) return null;
-    return tidesByTown[selectedSpot.coefMareeSlug] || tidesByTown['biarritz'] || null;
-  }, [selectedSpot, tidesByTown]);
-
   return (
     <div className="min-h-screen bg-[#03070d] relative text-white selection:bg-[#007AFF] selection:text-white font-sans antialiased overflow-x-hidden">
       
@@ -215,9 +216,9 @@ export const App: React.FC = () => {
                   <div className="h-[62vh] rounded-3xl overflow-hidden liquid-glass-card border border-white/[0.12] mb-2 shadow-xl animate-fade-in">
                     <SpotMap
                       spots={filteredSpots}
-                      selectedSpot={selectedSpot}
-                      onSelectSpot={(sp) => setSelectedSpot(sp)}
-                      onOpenDetails={(sp) => setSelectedSpot(sp)}
+                      selectedSpot={mapSelectedSpot}
+                      onSelectSpot={setMapSelectedSpot}
+                      onOpenDetails={(sp) => setModalSpot(sp)}
                       onToggleFavorite={handleToggleFavorite}
                     />
                   </div>
@@ -246,7 +247,6 @@ export const App: React.FC = () => {
                     {filteredSpots.map(({ spot, score, tide, isFavorite }, index) => (
                       <div
                         key={spot.id}
-                        onMouseEnter={() => setSelectedSpot(spot)}
                         className="animate-fade-in"
                         style={{
                           animationDelay: `${Math.min(index * 25, 200)}ms`,
@@ -260,7 +260,7 @@ export const App: React.FC = () => {
                           isFavorite={isFavorite}
                           isTop={index === 0 && !searchTerm && selectedTown === 'ALL' && !showFavoritesOnly}
                           onToggleFavorite={handleToggleFavorite}
-                          onSelectSpot={(sp) => setSelectedSpot(sp)}
+                          onSelectSpot={(sp) => setModalSpot(sp)}
                         />
                       </div>
                     ))}
@@ -274,9 +274,9 @@ export const App: React.FC = () => {
             <div className="hidden lg:block flex-1 sticky top-16 h-[calc(100vh-100px)] rounded-[2rem] overflow-hidden liquid-glass-card border border-white/[0.12] shadow-2xl">
               <SpotMap
                 spots={filteredSpots}
-                selectedSpot={selectedSpot}
-                onSelectSpot={(sp) => setSelectedSpot(sp)}
-                onOpenDetails={(sp) => setSelectedSpot(sp)}
+                selectedSpot={mapSelectedSpot}
+                onSelectSpot={setMapSelectedSpot}
+                onOpenDetails={(sp) => setModalSpot(sp)}
                 onToggleFavorite={handleToggleFavorite}
               />
             </div>
@@ -305,15 +305,20 @@ export const App: React.FC = () => {
       </div>
 
       {/* Spot Detail Mobile Bottom Sheet / Modal */}
-      {selectedSpot && selectedSpotTide && (
+      {modalSpot && (
         <SpotDetailModal
-          spot={selectedSpot}
-          score={evaluateSpotConditions(selectedSpot, selectedSpotTide)}
-          tide={selectedSpotTide}
-          isFavorite={favorites.includes(selectedSpot.id)}
+          spot={modalSpot}
+          score={evaluateSpotConditions(
+            modalSpot,
+            tidesByTown[modalSpot.coefMareeSlug] || tidesByTown['biarritz'],
+            marineByTown[modalSpot.coefMareeSlug] || marineByTown['biarritz'],
+            targetDate
+          )}
+          tide={tidesByTown[modalSpot.coefMareeSlug] || tidesByTown['biarritz']}
+          isFavorite={favorites.includes(modalSpot.id)}
           isToday={selectedDayOffset === 0}
           onToggleFavorite={handleToggleFavorite}
-          onClose={() => setSelectedSpot(null)}
+          onClose={() => setModalSpot(null)}
         />
       )}
 
