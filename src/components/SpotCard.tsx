@@ -1,6 +1,6 @@
 import React from 'react';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { Star, ChevronRight, Clock, Flame } from 'lucide-react';
+import { Star, ChevronRight, Clock, Flame, Waves } from 'lucide-react';
 
 interface SpotCardProps {
   spot: Spot;
@@ -60,6 +60,18 @@ export const SpotCard: React.FC<SpotCardProps> = ({
       .replace(/\s*,\s*/g, ' · ');
   };
 
+  const getSwellHeightText = () => {
+    if (score.breakdown && typeof score.breakdown.effectiveSwellHeight === 'number') {
+      const h = score.breakdown.effectiveSwellHeight;
+      if (h < 0.25) return '< 0.3m';
+      return `~${h.toFixed(1)}m`;
+    }
+    if (spot.optimalSize) {
+      return `~${spot.optimalSize.toFixed(1)}m`;
+    }
+    return spot.bestSwell.split(' ')[0] || '1.0m';
+  };
+
   const badgeStyle = getScoreBadgeStyle();
 
   return (
@@ -112,14 +124,27 @@ export const SpotCard: React.FC<SpotCardProps> = ({
         </div>
       </div>
 
-      {/* Ligne 3 : Créneau horaire clair et explicite + Chevron */}
+      {/* Ligne 3 : Taille de houle + Créneau horaire clair + Chevron */}
       <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/[0.06] text-xs min-w-0">
-        <div className="flex items-center gap-1.5 min-w-0 truncate text-white/75">
-          <Clock className="w-3.5 h-3.5 text-[#0A84FF] shrink-0 stroke-[2.2]" />
-          <span className="text-[11px] text-white/45 font-medium shrink-0">Idéal :</span>
-          <span className="text-xs font-mono font-semibold text-white truncate">
-            {formatCompactWindow(score.bestWindowToday)}
-          </span>
+        <div className="flex items-center gap-2.5 min-w-0 truncate">
+          
+          {/* Badge Taille de houle au déferlement */}
+          <div className="flex items-center gap-1.5 shrink-0 px-2 py-0.5 rounded-lg bg-[#30B0C7]/15 border border-[#30B0C7]/30 text-[#4cd6ed]">
+            <Waves className="w-3.5 h-3.5 text-[#30B0C7] shrink-0 stroke-[2.2]" />
+            <span className="text-xs font-mono font-bold text-white tracking-tight">
+              {getSwellHeightText()}
+            </span>
+          </div>
+
+          {/* Créneau horaire */}
+          <div className="flex items-center gap-1.5 min-w-0 truncate text-white/75">
+            <Clock className="w-3.5 h-3.5 text-[#0A84FF] shrink-0 stroke-[2.2]" />
+            <span className="text-[11px] text-white/45 font-medium shrink-0">Idéal :</span>
+            <span className="text-xs font-mono font-semibold text-white truncate">
+              {formatCompactWindow(score.bestWindowToday)}
+            </span>
+          </div>
+
         </div>
 
         <div className="flex items-center gap-1 shrink-0 text-white/30 group-hover:text-white/80 transition-colors">
