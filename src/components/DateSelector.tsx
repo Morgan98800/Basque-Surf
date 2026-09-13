@@ -45,9 +45,9 @@ export const DateSelector: React.FC<DateSelectorProps> = ({
             <button
               key={item.offset}
               onClick={() => onSelectOffset(item.offset)}
-              className={`flex flex-col items-center justify-center min-w-[3.6rem] sm:min-w-[4.2rem] py-2 px-2 rounded-2xl transition-all duration-300 active:scale-95 shrink-0 ${
+              className={`flex flex-col items-center justify-center min-w-[3.6rem] sm:min-w-[4.2rem] py-2 px-2 rounded-2xl transition-all duration-200 active:scale-90 shrink-0 ${
                 isSelected
-                  ? 'bg-gradient-to-b from-white to-white/90 text-black font-bold shadow-[0_4px_20px_rgba(255,255,255,0.3)] border border-white'
+                  ? 'bg-white text-black font-bold shadow-[0_6px_24px_rgba(255,255,255,0.3)] border border-white'
                   : 'liquid-glass-pill hover:bg-white/[0.12] text-white/70 hover:text-white'
               }`}
               title={item.fullDateStr}
@@ -55,12 +55,13 @@ export const DateSelector: React.FC<DateSelectorProps> = ({
               <span className={`text-[10px] uppercase font-semibold tracking-wider ${isSelected ? 'text-black/60' : 'text-white/40'}`}>
                 {item.dayLabel}
               </span>
-              <span className="text-base sm:text-lg font-bold font-mono leading-none my-1">
+              <span className="text-base sm:text-lg font-bold font-mono leading-none my-1 tracking-tight">
                 {item.dayNumber}
               </span>
               <span className={`text-[9px] font-medium lowercase ${isSelected ? 'text-black/60' : 'text-white/40'}`}>
                 {item.monthLabel}
               </span>
+              <span className={`w-1 h-1 rounded-full mt-1 transition-all ${isSelected ? 'bg-[#007AFF] shadow-[0_0_6px_rgba(0,122,255,0.9)]' : 'bg-transparent'}`} />
             </button>
           );
         })}

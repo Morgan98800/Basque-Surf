@@ -88,14 +88,14 @@ export const SpotCard: React.FC<SpotCardProps> = ({
 
         {/* Spot Name & Score Row */}
         <div className="flex items-start justify-between gap-3 mb-2">
-          <h3 className="font-bold text-white text-lg sm:text-xl tracking-tight leading-snug">
+          <h3 className="font-bold text-white text-lg sm:text-xl tracking-tight leading-snug group-hover:text-sky-300/90 transition-colors">
             {spot.name}
           </h3>
 
-          {/* Note sur 10 style Widget Apple épuré */}
-          <div className={`shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full border ${badge.bg}`}>
+          {/* Note sur 10 style Complication Apple Watch épurée */}
+          <div className={`shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full border backdrop-blur-md ${badge.bg}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`}></span>
-            <span className="text-base sm:text-lg font-bold font-mono">
+            <span className="text-base sm:text-lg font-bold font-mono tracking-tight">
               {score.scoreFormatted}
             </span>
           </div>
@@ -115,14 +115,14 @@ export const SpotCard: React.FC<SpotCardProps> = ({
         </p>
       </div>
 
-      {/* Footer Info: Best window & Details button */}
-      <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-xs text-white/50 font-medium">
-        <div className="flex items-center gap-1.5 text-white/80">
+      {/* Footer Info: Capsule Créneau & Action style iOS */}
+      <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/[0.04] border border-white/[0.06] text-white/80">
           <Clock className="w-3.5 h-3.5 text-[#0A84FF] stroke-[2]" />
-          <span>Créneau : <strong className="text-white font-mono font-semibold">{score.bestWindowToday || 'Journée'}</strong></span>
+          <span className="text-[11px] font-mono text-white/90 font-medium">{score.bestWindowToday || 'Journée'}</span>
         </div>
 
-        <div className="flex items-center gap-1 text-[#0A84FF] font-semibold group-hover:translate-x-0.5 transition-transform">
+        <div className="flex items-center gap-1 text-[#0A84FF] font-semibold group-hover:translate-x-1 transition-transform">
           <span className="hidden sm:inline text-xs">Détails</span>
           <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
         </div>

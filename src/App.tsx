@@ -155,7 +155,7 @@ export const App: React.FC = () => {
 
         {/* Dynamic View: Map or List */}
         {viewMode === 'map' ? (
-          <section className="space-y-2">
+          <section className="space-y-2 animate-fade-in">
             <SpotMap
               spots={filteredSpots}
               selectedSpot={selectedSpot}
@@ -165,14 +165,14 @@ export const App: React.FC = () => {
             />
           </section>
         ) : (
-          <section className="space-y-2.5">
+          <section className="space-y-2.5 animate-fade-in">
             {loading && Object.keys(tidesByTown).length === 0 ? (
               <div className="py-20 text-center space-y-2.5">
                 <div className="w-6 h-6 border-2 border-[#007AFF] border-t-transparent rounded-full animate-spin mx-auto"></div>
                 <p className="text-xs text-white/50 font-medium">Chargement des conditions...</p>
               </div>
             ) : filteredSpots.length === 0 ? (
-              <div className="py-14 text-center bg-white/[0.04] border border-white/[0.08] rounded-3xl p-6 space-y-2">
+              <div className="py-14 text-center bg-white/[0.04] border border-white/[0.08] rounded-3xl p-6 space-y-2 animate-slide-up">
                 <AlertCircle className="w-8 h-8 text-white/30 mx-auto stroke-[1.8]" />
                 <h3 className="text-sm font-semibold text-white">Aucun spot trouvé</h3>
                 <p className="text-xs text-white/50 max-w-xs mx-auto font-normal">
@@ -184,16 +184,24 @@ export const App: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
                 {filteredSpots.map(({ spot, score, tide, isFavorite }, index) => (
-                  <SpotCard
+                  <div
                     key={spot.id}
-                    spot={spot}
-                    score={score}
-                    tide={tide}
-                    isFavorite={isFavorite}
-                    isTop={index === 0 && !searchTerm && selectedTown === 'ALL' && !showFavoritesOnly}
-                    onToggleFavorite={handleToggleFavorite}
-                    onSelectSpot={(sp) => setSelectedSpot(sp)}
-                  />
+                    className="animate-fade-in"
+                    style={{
+                      animationDelay: `${Math.min(index * 30, 240)}ms`,
+                      animationFillMode: 'both',
+                    }}
+                  >
+                    <SpotCard
+                      spot={spot}
+                      score={score}
+                      tide={tide}
+                      isFavorite={isFavorite}
+                      isTop={index === 0 && !searchTerm && selectedTown === 'ALL' && !showFavoritesOnly}
+                      onToggleFavorite={handleToggleFavorite}
+                      onSelectSpot={(sp) => setSelectedSpot(sp)}
+                    />
+                  </div>
                 ))}
               </div>
             )}

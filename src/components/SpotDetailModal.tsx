@@ -131,52 +131,163 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
             <p>{score.explanation}</p>
           </div>
 
-          {/* Courbe Horaire 24H façon Apple Météo */}
-          <div className="space-y-1.5">
+          {/* Courbe Continue Fluide façon Apple Météo */}
+          <div className="space-y-2">
             <div className="flex items-center justify-between text-xs px-1">
-              <span className="font-semibold text-white">Courbe 24h ({tide.townName})</span>
-              <span className="text-white/50">Idéal : {spot.optimalTideRange.minHeight}m - {spot.optimalTideRange.maxHeight}m</span>
+              <span className="font-semibold text-white">Marégraphe 24h ({tide.townName})</span>
+              <span className="text-white/50 text-[11px]">Plage idéale : {spot.optimalTideRange.minHeight}m - {spot.optimalTideRange.maxHeight}m</span>
             </div>
 
-            <div className="bg-white/[0.06] border border-white/[0.08] rounded-2xl p-3.5">
-              <div className="h-24 flex items-end justify-between gap-1 pt-3 pb-1">
-                {tide.hourlyCurve.map((pt, idx) => {
-                  const hNormalized = Math.max(0.1, Math.min(1, (pt.height - 0.5) / 4.0));
-                  const isCurrent = isToday && idx === currentHour;
-                  const isOptimal = pt.height >= spot.optimalTideRange.minHeight && pt.height <= spot.optimalTideRange.maxHeight;
+            <div className="liquid-glass-card rounded-2xl p-4 overflow-hidden">
+              {(() => {
+                const svgWidth = 500;
+                const svgHeight = 110;
+                const paddingBottom = 22;
+                const usableHeight = svgHeight - paddingBottom - 16;
+                const minH = 0.5;
+                const maxH = 4.6;
 
-                  return (
-                    <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end relative">
-                      <div
-                        style={{ height: `${hNormalized * 100}%` }}
-                        className={`w-full rounded-t-sm transition-all ${
-                          isCurrent
-                            ? 'bg-[#FF9500] shadow-[0_0_8px_rgba(255,149,0,0.6)]'
-                            : isOptimal
-                            ? 'bg-[#34C759]'
-                            : 'bg-white/10'
-                        }`}
+                const pts = tide.hourlyCurve.map((pt, idx) => {
+                  const x = (idx / 23) * svgWidth;
+                  const norm = Math.max(0, Math.min(1, (pt.height - minH) / (maxH - minH)));
+                  const y = (svgHeight - paddingBottom) - norm * usableHeight;
+                  return { x, y, pt, idx };
+                });
+
+                let pathD = '';
+                if (pts.length > 0) {
+                  pathD = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+                  for (let i = 0; i < pts.length - 1; i++) {
+                    const p0 = pts[Math.max(0, i - 1)];
+                    const p1 = pts[i];
+                    const p2 = pts[i + 1];
+                    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+
+                    const cp1x = p1.x + (p2.x - p0.x) / 6;
+                    const cp1y = p1.y + (p2.y - p0.y) / 6;
+                    const cp2x = p2.x - (p3.x - p1.x) / 6;
+                    const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+                    pathD += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+                  }
+                }
+
+                const areaD = pathD ? `${pathD} L ${svgWidth} ${svgHeight - paddingBottom} L 0 ${svgHeight - paddingBottom} Z` : '';
+
+                const optMinY = (svgHeight - paddingBottom) - Math.max(0, Math.min(1, (spot.optimalTideRange.minHeight - minH) / (maxH - minH))) * usableHeight;
+                const optMaxY = (svgHeight - paddingBottom) - Math.max(0, Math.min(1, (spot.optimalTideRange.maxHeight - minH) / (maxH - minH))) * usableHeight;
+                const optTop = Math.min(optMinY, optMaxY);
+                const optHeight = Math.abs(optMinY - optMaxY);
+
+                const currentPt = isToday ? pts[Math.min(pts.length - 1, Math.max(0, currentHour))] : null;
+
+                return (
+                  <div className="w-full">
+                    <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-28 overflow-visible select-none">
+                      <defs>
+                        <linearGradient id="appleTideArea" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#0A84FF" stopOpacity="0.32" />
+                          <stop offset="80%" stopColor="#0A84FF" stopOpacity="0.04" />
+                          <stop offset="100%" stopColor="#0A84FF" stopOpacity="0" />
+                        </linearGradient>
+                        <linearGradient id="appleTideLine" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor="#30B0C7" />
+                          <stop offset="50%" stopColor="#0A84FF" />
+                          <stop offset="100%" stopColor="#5E5CE6" />
+                        </linearGradient>
+                      </defs>
+
+                      {/* Zone Idéale du Spot en surbrillance émeraude */}
+                      <rect
+                        x="0"
+                        y={optTop}
+                        width={svgWidth}
+                        height={optHeight}
+                        fill="#30D158"
+                        fillOpacity="0.08"
+                        stroke="#30D158"
+                        strokeOpacity="0.22"
+                        strokeDasharray="3 3"
+                        rx="3"
                       />
-                      <span className={`text-[8px] mt-1.5 font-mono ${isCurrent ? 'text-[#FF9500] font-bold' : 'text-white/30'}`}>
-                        {idx % 4 === 0 ? pt.time.split(':')[0] + 'h' : ''}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+                      <text x={svgWidth - 4} y={optTop + 10} fill="#30D158" fontSize="9" fontWeight="600" textAnchor="end">
+                        Fenêtre idéale
+                      </text>
 
-              <div className="flex items-center justify-between text-[10px] text-white/50 mt-2.5 pt-2.5 border-t border-white/[0.06]">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#34C759]"></span>
-                  <span>Fenêtre idéale pour ce spot</span>
-                </div>
-                {isToday && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#FF9500]"></span>
-                    <span>Heure actuelle</span>
+                      {/* Remplissage fluide dégradé */}
+                      <path d={areaD} fill="url(#appleTideArea)" />
+
+                      {/* Ligne de marée continue */}
+                      <path d={pathD} fill="none" stroke="url(#appleTideLine)" strokeWidth="2.5" strokeLinecap="round" />
+
+                      {/* Ligne de sol / Zéro relatif */}
+                      <line x1="0" y1={svgHeight - paddingBottom} x2={svgWidth} y2={svgHeight - paddingBottom} stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+
+                      {/* Indicateur de position courante (si Aujourd'hui) */}
+                      {currentPt && (
+                        <g>
+                          <line
+                            x1={currentPt.x}
+                            y1={currentPt.y}
+                            x2={currentPt.x}
+                            y2={svgHeight - paddingBottom}
+                            stroke="#FF9500"
+                            strokeDasharray="2 2"
+                            strokeOpacity="0.75"
+                            strokeWidth="1.2"
+                          />
+                          <circle cx={currentPt.x} cy={currentPt.y} r="8" fill="#FF9500" fillOpacity="0.25" />
+                          <circle cx={currentPt.x} cy={currentPt.y} r="4.5" fill="#FF9500" stroke="#FFFFFF" strokeWidth="1.8" />
+                          <text
+                            x={currentPt.x}
+                            y={Math.max(10, currentPt.y - 7)}
+                            fill="#FF9500"
+                            fontSize="9"
+                            fontWeight="700"
+                            textAnchor="middle"
+                            fontFamily="monospace"
+                          >
+                            {currentPt.pt.height}m
+                          </text>
+                        </g>
+                      )}
+
+                      {/* Graduations horaires toutes les 4h */}
+                      {[0, 4, 8, 12, 16, 20, 23].map((h) => {
+                        const x = (h / 23) * svgWidth;
+                        const isCurrentH = isToday && h === currentHour;
+                        return (
+                          <text
+                            key={h}
+                            x={x}
+                            y={svgHeight - 4}
+                            fill={isCurrentH ? '#FF9500' : 'rgba(255,255,255,0.35)'}
+                            fontSize="9"
+                            fontFamily="monospace"
+                            fontWeight={isCurrentH ? '700' : '500'}
+                            textAnchor={h === 0 ? 'start' : h === 23 ? 'end' : 'middle'}
+                          >
+                            {h.toString().padStart(2, '0')}h
+                          </text>
+                        );
+                      })}
+                    </svg>
+
+                    <div className="flex items-center justify-between text-[10px] text-white/50 mt-2.5 pt-2.5 border-t border-white/[0.06]">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#30D158]"></span>
+                        <span>Zone d'eau optimale ({spot.optimalTideRange.minHeight}m - {spot.optimalTideRange.maxHeight}m)</span>
+                      </div>
+                      {isToday && (
+                        <div className="flex items-center gap-1.5 font-medium text-[#FF9500]">
+                          <span className="w-2 h-2 rounded-full bg-[#FF9500]"></span>
+                          <span>Marée actuelle ({currentHour}h)</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
+                );
+              })()}
             </div>
           </div>
 
