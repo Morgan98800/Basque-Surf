@@ -257,7 +257,7 @@ export const App: React.FC = () => {
         </main>
 
         {/* Barre d'action inférieure flottante style iOS Liquid Glass Dock (1 Ligne Compacte) */}
-        <nav className="fixed bottom-0 inset-x-0 z-40 liquid-glass-nav pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2">
+        <nav className="fixed bottom-0 inset-x-0 z-40 liquid-glass-nav pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5">
           <div className="max-w-5xl mx-auto px-3.5 sm:px-6">
             <SearchBar
               searchTerm={searchTerm}

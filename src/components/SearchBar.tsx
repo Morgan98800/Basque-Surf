@@ -96,12 +96,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         </div>
       )}
 
-      {/* Dock Unifié sur 1 SEULE LIGNE (hauteur tactile 44px Apple HIG) */}
-      <div className="flex items-center gap-1.5 sm:gap-2 h-11 w-full">
+      {/* Dock Unifié sur 1 SEULE LIGNE (hauteur tactile ~48px Apple HIG) */}
+      <div className="flex items-center justify-between gap-2 sm:gap-3 h-12 w-full">
 
         {/* Vue Mobile Recherche Dépliée */}
         {isSearchExpandedMobile ? (
-          <div className="flex items-center gap-2 w-full sm:hidden animate-fade-in">
+          <div className="flex items-center gap-2.5 w-full sm:hidden animate-fade-in">
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none stroke-[2]" />
               <input
@@ -110,12 +110,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Rechercher une plage..."
-                className="w-full h-11 pl-9 pr-9 rounded-2xl bg-white/[0.08] border border-white/[0.14] text-white placeholder-white/40 text-xs focus:outline-none focus:border-sky-400"
+                className="w-full h-12 pl-10 pr-10 rounded-2xl bg-white/[0.08] border border-white/[0.14] text-white placeholder-white/40 text-xs focus:outline-none focus:border-sky-400"
               />
               {searchTerm && (
                 <button
                   onClick={() => onSearchChange('')}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-white/40 hover:text-white active:scale-90"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-white/40 hover:text-white active:scale-90"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -123,7 +123,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             </div>
             <button
               onClick={() => setIsSearchExpandedMobile(false)}
-              className="h-11 px-3 text-xs font-semibold text-sky-400 flex items-center justify-center shrink-0 active:opacity-70"
+              className="h-12 px-3 text-xs font-semibold text-sky-400 flex items-center justify-center shrink-0 active:opacity-70"
             >
               Annuler
             </button>
@@ -134,43 +134,45 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             <button
               type="button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`h-11 px-3 sm:px-3.5 rounded-2xl border flex items-center gap-1.5 text-xs font-semibold shrink-0 transition active:scale-95 ${
+              className={`h-12 px-3.5 sm:px-4 rounded-2xl border flex items-center justify-between sm:justify-start gap-2 text-xs font-semibold flex-1 sm:flex-initial transition active:scale-95 ${
                 selectedTown !== 'ALL'
                   ? 'bg-white text-black border-white shadow-sm'
                   : 'liquid-glass-pill text-white hover:bg-white/[0.12]'
               }`}
               title="Choisir une commune"
             >
-              <MapPin className={`w-3.5 h-3.5 stroke-[2] ${selectedTown !== 'ALL' ? 'text-black' : 'text-[#38bdf8]'}`} />
-              <span className="max-w-[78px] sm:max-w-none truncate">{currentLabel}</span>
-              <ChevronDown className={`w-3 h-3 stroke-[2] transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
+              <div className="flex items-center gap-2 min-w-0">
+                <MapPin className={`w-4 h-4 shrink-0 stroke-[2] ${selectedTown !== 'ALL' ? 'text-black' : 'text-[#38bdf8]'}`} />
+                <span className="truncate">{currentLabel}</span>
+              </div>
+              <ChevronDown className={`w-3.5 h-3.5 shrink-0 stroke-[2] transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Segmented Control Liste / Carte */}
-            <div className="flex items-center liquid-glass-pill rounded-2xl p-1 h-11 shrink-0 gap-0.5">
+            <div className="flex items-center liquid-glass-pill rounded-2xl p-1 h-12 shrink-0 gap-1">
               <button
                 onClick={() => onViewModeChange('list')}
-                className={`h-9 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
+                className={`h-10 px-3 sm:px-3.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
                   viewMode === 'list'
                     ? 'bg-white/20 text-white shadow-sm font-bold border border-white/15'
                     : 'text-white/60 hover:text-white'
                 }`}
                 title="Vue liste"
               >
-                <LayoutList className="w-3.5 h-3.5 stroke-[2]" />
+                <LayoutList className="w-4 h-4 stroke-[2]" />
                 <span className="hidden xs:inline">Liste</span>
               </button>
 
               <button
                 onClick={() => onViewModeChange('map')}
-                className={`h-9 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
+                className={`h-10 px-3 sm:px-3.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
                   viewMode === 'map'
                     ? 'bg-white/20 text-white shadow-sm font-bold border border-white/15'
                     : 'text-white/60 hover:text-white'
                 }`}
                 title="Vue carte"
               >
-                <Map className="w-3.5 h-3.5 stroke-[2]" />
+                <Map className="w-4 h-4 stroke-[2]" />
                 <span className="hidden xs:inline">Carte</span>
               </button>
             </div>
@@ -178,7 +180,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             {/* Bouton Favoris */}
             <button
               onClick={onToggleFavoritesOnly}
-              className={`h-11 px-3 sm:px-3.5 min-w-[44px] rounded-2xl text-xs font-medium flex items-center justify-center gap-1.5 shrink-0 transition active:scale-95 ${
+              className={`h-12 px-3.5 sm:px-4 min-w-[48px] rounded-2xl text-xs font-medium flex items-center justify-center gap-1.5 shrink-0 transition active:scale-95 ${
                 showFavoritesOnly
                   ? 'bg-[#FF9500]/25 text-[#FF9F0A] border border-[#FF9500]/50 shadow-[0_0_10px_rgba(255,149,0,0.3)]'
                   : 'liquid-glass-pill text-white/60 hover:text-white'
@@ -195,10 +197,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               )}
             </button>
 
-            {/* Bouton Loupe Dépliable sur Mobile (Carré 44x44px Apple HIG) */}
+            {/* Bouton Loupe Dépliable sur Mobile (Carré 48x48px) */}
             <button
               onClick={() => setIsSearchExpandedMobile(true)}
-              className={`h-11 w-11 rounded-2xl flex sm:hidden items-center justify-center transition active:scale-95 shrink-0 ${
+              className={`h-12 w-12 rounded-2xl flex sm:hidden items-center justify-center transition active:scale-95 shrink-0 ${
                 searchTerm 
                   ? 'bg-sky-500/20 text-sky-400 border border-sky-400/40' 
                   : 'liquid-glass-pill text-white/60 hover:text-white'
