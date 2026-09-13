@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { Spot, SpotScore, TideData } from '../types/index';
 import { Navigation, Star, Clock, ChevronRight } from 'lucide-react';
+import { GPSActionSheet, getSavedGPSPreference, openGPSUrl, GPSProvider } from './GPSActionSheet';
 
 interface SpotMapProps {
   spots: Array<{ spot: Spot; score: SpotScore; tide: TideData; isFavorite: boolean }>;
@@ -139,14 +140,17 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     }
   }, [selectedSpot]);
 
+  const [showGPSChoice, setShowGPSChoice] = useState(false);
+  const [gpsPref, setGpsPref] = useState<GPSProvider | null>(getSavedGPSPreference);
+
   const activeSpotData = spots.find((s) => s.spot.id === selectedSpot?.id) || spots[0];
 
-  const openGPS = (lat: number, lon: number, name: string) => {
-    const isApple = /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
-    if (isApple) {
-      window.open(`maps://maps.apple.com/?daddr=${lat},${lon}&q=${encodeURIComponent(name)}&dirflg=d`, '_blank');
+  const handleOpenGPS = () => {
+    if (!activeSpotData) return;
+    if (gpsPref) {
+      openGPSUrl(gpsPref, activeSpotData.spot.lat, activeSpotData.spot.lon, activeSpotData.spot.name);
     } else {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
+      setShowGPSChoice(true);
     }
   };
 
@@ -223,18 +227,39 @@ export const SpotMap: React.FC<SpotMapProps> = ({
               <ChevronRight className="w-3.5 h-3.5 text-white/60 stroke-[2.5]" />
             </button>
 
-            {/* Bouton GPS unique & puissant façon Apple Maps */}
+            {/* Bouton GPS vers l'app préférée (Google Maps, Apple Plans, Waze) */}
             <button
-              onClick={() => openGPS(activeSpotData.spot.lat, activeSpotData.spot.lon, activeSpotData.spot.name)}
+              onClick={handleOpenGPS}
               className="flex-1 sm:flex-initial h-10 px-4 sm:px-5 rounded-full bg-[#007AFF] hover:bg-[#0062cc] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition"
+              title="Lancer l'itinéraire dans votre application préférée"
             >
               <Navigation className="w-3.5 h-3.5 fill-white stroke-white" />
-              <span>Y aller</span>
+              <span>
+                {gpsPref === 'google' 
+                  ? 'Google Maps' 
+                  : gpsPref === 'waze' 
+                  ? 'Waze' 
+                  : gpsPref === 'apple' 
+                  ? 'Apple Plans' 
+                  : 'Y aller'}
+              </span>
             </button>
 
           </div>
 
         </div>
+      )}
+
+      {/* Action Sheet pour choisir l'application de navigation */}
+      {activeSpotData && (
+        <GPSActionSheet
+          isOpen={showGPSChoice}
+          onClose={() => setShowGPSChoice(false)}
+          lat={activeSpotData.spot.lat}
+          lon={activeSpotData.spot.lon}
+          spotName={activeSpotData.spot.name}
+          onPreferenceChange={(p) => setGpsPref(p)}
+        />
       )}
 
     </div>

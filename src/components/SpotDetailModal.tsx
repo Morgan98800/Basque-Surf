@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, Navigation } from 'lucide-react';
+import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, Navigation, ChevronDown } from 'lucide-react';
+import { GPSActionSheet, getSavedGPSPreference, openGPSUrl, GPSProvider } from './GPSActionSheet';
 
 interface SpotDetailModalProps {
   spot: Spot | null;
@@ -21,6 +22,9 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   onToggleFavorite,
   onClose,
 }) => {
+  const [showGPSChoice, setShowGPSChoice] = useState(false);
+  const [gpsPref, setGpsPref] = useState<GPSProvider | null>(getSavedGPSPreference);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -33,13 +37,12 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
 
   const currentHour = new Date().getHours();
 
-  // Ouvre l'application GPS native
-  const openGPS = () => {
-    const isApple = /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
-    if (isApple) {
-      window.open(`maps://maps.apple.com/?daddr=${spot.lat},${spot.lon}&q=${encodeURIComponent(spot.name)}&dirflg=d`, '_blank');
+  // Ouvre l'application GPS préférée ou affiche le choix
+  const handleOpenGPS = () => {
+    if (gpsPref) {
+      openGPSUrl(gpsPref, spot.lat, spot.lon, spot.name);
     } else {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lon}`, '_blank');
+      setShowGPSChoice(true);
     }
   };
 
@@ -340,18 +343,48 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
 
         </div>
 
-        {/* Bottom Action: Bouton Apple Style Pleine Largeur avec Safe Area iOS */}
+        {/* Bottom Action: Bouton Apple Style avec choix de l'application préférée et Safe Area iOS */}
         <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-white/[0.08] bg-[#161618]">
-          <button
-            onClick={openGPS}
-            className="w-full h-11 px-6 rounded-full bg-[#007AFF] hover:bg-[#0062cc] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition shadow-md"
-          >
-            <Navigation className="w-4 h-4 fill-white stroke-white" />
-            <span>{/iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent) ? 'Itinéraire Apple Plans' : 'Itinéraire Google Maps'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleOpenGPS}
+              className="flex-1 h-11 px-5 rounded-full bg-[#007AFF] hover:bg-[#0062cc] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition shadow-md"
+            >
+              <Navigation className="w-4 h-4 fill-white stroke-white" />
+              <span>
+                {gpsPref === 'google' 
+                  ? 'Itinéraire Google Maps' 
+                  : gpsPref === 'waze' 
+                  ? 'Itinéraire Waze' 
+                  : gpsPref === 'apple' 
+                  ? 'Itinéraire Apple Plans' 
+                  : 'Itinéraire GPS'}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setShowGPSChoice(true)}
+              className="h-11 px-3.5 rounded-full bg-white/[0.08] hover:bg-white/[0.12] text-white/70 hover:text-white border border-white/[0.1] text-xs font-semibold flex items-center gap-1 transition active:scale-95 shrink-0"
+              title="Changer d'application de navigation (Google Maps, Apple Plans, Waze)"
+            >
+              <span>{gpsPref ? 'Changer' : 'Choisir'}</span>
+              <ChevronDown className="w-3.5 h-3.5 stroke-[2]" />
+            </button>
+          </div>
         </div>
 
       </div>
+
+      {/* Action Sheet iOS pour le choix du GPS */}
+      <GPSActionSheet
+        isOpen={showGPSChoice}
+        onClose={() => setShowGPSChoice(false)}
+        lat={spot.lat}
+        lon={spot.lon}
+        spotName={spot.name}
+        onPreferenceChange={(p) => setGpsPref(p)}
+      />
+
     </div>
   );
 };
