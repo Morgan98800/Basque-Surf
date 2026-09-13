@@ -167,7 +167,7 @@ export const App: React.FC = () => {
         <Header tideData={activeHeaderTide} />
 
         {/* Conteneur Principal : Mobile Single-Column / Desktop Split-View Apple Plans */}
-        <main className="flex-1 max-w-7xl w-full min-w-0 mx-auto px-3.5 sm:px-6 pt-3 pb-24 sm:pb-24 overflow-x-hidden">
+        <main className="flex-1 max-w-7xl w-full min-w-0 mx-auto px-4 sm:px-6 pt-3 pb-24 sm:pb-24 overflow-x-hidden">
           
           <div className="flex flex-col lg:flex-row gap-5 items-start w-full min-w-0">
             
@@ -183,7 +183,7 @@ export const App: React.FC = () => {
               {/* Sur mobile : affichage carte si viewMode === 'map' */}
               <div className="block lg:hidden">
                 {viewMode === 'map' ? (
-                  <section className="space-y-2 animate-fade-in">
+                  <div className="h-[62vh] rounded-3xl overflow-hidden liquid-glass-card border border-white/[0.12] mb-2 shadow-xl animate-fade-in">
                     <SpotMap
                       spots={filteredSpots}
                       selectedSpot={selectedSpot}
@@ -191,7 +191,7 @@ export const App: React.FC = () => {
                       onOpenDetails={(sp) => setSelectedSpot(sp)}
                       onToggleFavorite={handleToggleFavorite}
                     />
-                  </section>
+                  </div>
                 ) : null}
               </div>
 
@@ -258,7 +258,7 @@ export const App: React.FC = () => {
 
         {/* Barre d'action inférieure flottante style iOS Liquid Glass Dock (1 Ligne Compacte) */}
         <nav className="fixed bottom-0 inset-x-0 z-40 liquid-glass-nav pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5">
-          <div className="max-w-5xl mx-auto px-3.5 sm:px-6">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <SearchBar
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
