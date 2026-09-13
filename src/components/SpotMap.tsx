@@ -29,10 +29,12 @@ export const SpotMap: React.FC<SpotMapProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
   const [currentZoom, setCurrentZoom] = useState<number>(12);
+  const [mapType, setMapType] = useState<'streets' | 'satellite'>('streets');
 
-  // Initialisation de la carte Leaflet avec CARTO Dark Matter
+  // Initialisation de la carte Leaflet
   useEffect(() => {
     if (!mapContainerRef.current) return;
     if (mapInstanceRef.current) return;
@@ -47,11 +49,16 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       zoomControl: false,
     });
 
-    // Tuiles Esri World Dark Gray Canvas officielles (fond sombre profond, sans filigrane API)
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-      attribution: '&copy; Esri &copy; OpenStreetMap',
-      maxZoom: 16,
-    }).addTo(map);
+    // Tuiles CARTO Voyager couleur par défaut (océan bleu, sable doré, topographie côtière)
+    const initialLayer = L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+      {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 18,
+      }
+    ).addTo(map);
+    tileLayerRef.current = initialLayer;
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
@@ -71,6 +78,35 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       mapInstanceRef.current = null;
     };
   }, [onSelectSpot]);
+
+  // Changement dynamique de couche (Plan couleur vs Satellite)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (tileLayerRef.current) {
+      tileLayerRef.current.remove();
+    }
+
+    if (mapType === 'streets') {
+      tileLayerRef.current = L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+        {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 18,
+        }
+      ).addTo(map);
+    } else {
+      tileLayerRef.current = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+          attribution: '&copy; Esri &copy; Earthstar Geographics',
+          maxZoom: 18,
+        }
+      ).addTo(map);
+    }
+  }, [mapType]);
 
   // Mise à jour des marqueurs avec dé-encombrement intelligent
   useEffect(() => {
@@ -170,6 +206,32 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       
       {/* Conteneur Leaflet */}
       <div ref={mapContainerRef} className="flex-1 w-full h-full z-10" />
+
+      {/* Sélecteur de vue Apple (Plan couleur / Satellite) */}
+      <div className="absolute top-3 left-3 z-20 flex items-center p-0.5 rounded-full bg-[#1c1c1e]/90 backdrop-blur-xl border border-white/20 text-[11px] font-semibold shadow-xl">
+        <button
+          type="button"
+          onClick={() => setMapType('streets')}
+          className={`px-3 py-1 rounded-full transition-all duration-200 ${
+            mapType === 'streets'
+              ? 'bg-[#007AFF] text-white shadow-md'
+              : 'text-white/60 hover:text-white'
+          }`}
+        >
+          Plan couleur
+        </button>
+        <button
+          type="button"
+          onClick={() => setMapType('satellite')}
+          className={`px-3 py-1 rounded-full transition-all duration-200 ${
+            mapType === 'satellite'
+              ? 'bg-[#007AFF] text-white shadow-md'
+              : 'text-white/60 hover:text-white'
+          }`}
+        >
+          Satellite
+        </button>
+      </div>
 
       {/* Overlay État Vide sur la Carte */}
       {spots.length === 0 && (
