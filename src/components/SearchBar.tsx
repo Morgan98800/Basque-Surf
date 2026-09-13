@@ -27,7 +27,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onViewModeChange,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchExpandedMobile, setIsSearchExpandedMobile] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Ferme le menu au clic à l'extérieur
   useEffect(() => {
@@ -42,6 +44,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen]);
 
+  // Focus input quand la recherche s'étend sur mobile
+  useEffect(() => {
+    if (isSearchExpandedMobile && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearchExpandedMobile]);
+
   const townOptions: Array<{ value: BasqueTown | 'ALL'; label: string }> = [
     { value: 'ALL', label: 'Toute la Côte Basque' },
     ...BASQUE_TOWNS.map((t) => ({ value: t, label: t }))
@@ -54,7 +63,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       
       {/* Menu Déroulant style iOS Liquid Glass Popover */}
       {isMenuOpen && (
-        <div className="absolute bottom-full mb-2.5 left-0 z-50 w-72 max-w-[calc(100vw-2rem)] bg-[#0d1522]/95 backdrop-blur-3xl border border-white/[0.18] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.85)] overflow-hidden animate-slide-up p-2 divide-y divide-white/[0.08]">
+        <div className="absolute bottom-full mb-2 left-0 z-50 w-72 max-w-[calc(100vw-2rem)] bg-[#0d1522]/95 backdrop-blur-3xl border border-white/[0.18] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.85)] overflow-hidden animate-slide-up p-2 divide-y divide-white/[0.08]">
           <div className="px-3.5 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
             Commune de surf
           </div>
@@ -87,104 +96,144 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         </div>
       )}
 
-      {/* Navigation Dock : 2 lignes sur Mobile, 1 ligne sur Tablette/Desktop */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-        
-        {/* Ligne / Bloc Filtres Secondaires (Commune, Segmented Control, Favoris) */}
-        <div className="flex items-center gap-2 order-2 sm:order-1 justify-between sm:justify-start">
-          
-          {/* Bouton Menu Déroulant Commune */}
-          <button
-            type="button"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-2xl border flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold shrink-0 transition active:scale-95 ${
-              selectedTown !== 'ALL'
-                ? 'bg-gradient-to-b from-white to-white/95 text-black border-white shadow-[0_2px_12px_rgba(255,255,255,0.25)]'
-                : 'liquid-glass-pill hover:bg-white/[0.14] text-white'
-            }`}
-            title="Choisir une commune"
-          >
-            <MapPin className={`w-3.5 h-3.5 stroke-[2] ${selectedTown !== 'ALL' ? 'text-black' : 'text-[#38bdf8]'}`} />
-            <span className="max-w-[85px] sm:max-w-none truncate">{currentLabel}</span>
-            <ChevronDown className={`w-3 h-3 stroke-[2.5] transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
-          </button>
+      {/* Dock Unifié sur 1 SEULE LIGNE (hauteur ultra-compacte) */}
+      <div className="flex items-center gap-1.5 sm:gap-2 h-10 w-full">
 
-          {/* Segmented Control iOS Liquid Glass */}
-          <div className="flex items-center liquid-glass-pill rounded-2xl p-0.5 sm:p-1 h-9 sm:h-10 shrink-0">
+        {/* Vue Mobile Recherche Dépliée */}
+        {isSearchExpandedMobile ? (
+          <div className="flex items-center gap-2 w-full sm:hidden animate-fade-in">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Rechercher une plage..."
+                className="w-full h-9 pl-8.5 pr-8 rounded-2xl bg-white/[0.08] border border-white/[0.14] text-white placeholder-white/40 text-xs focus:outline-none focus:border-sky-400"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => onSearchChange('')}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-white/40 hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
             <button
-              onClick={() => onViewModeChange('list')}
-              className={`h-7 sm:h-8 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all duration-300 ${
-                viewMode === 'list'
-                  ? 'bg-gradient-to-b from-white/30 to-white/10 text-white shadow-md border border-white/20 font-bold'
-                  : 'text-white/60 hover:text-white'
-              }`}
-              title="Vue liste"
+              onClick={() => setIsSearchExpandedMobile(false)}
+              className="text-xs font-semibold text-sky-400 px-2 py-1 shrink-0 active:opacity-70"
             >
-              <LayoutList className="w-3.5 h-3.5 stroke-[2]" />
-              <span>Liste</span>
-            </button>
-
-            <button
-              onClick={() => onViewModeChange('map')}
-              className={`h-7 sm:h-8 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all duration-300 ${
-                viewMode === 'map'
-                  ? 'bg-gradient-to-b from-white/30 to-white/10 text-white shadow-md border border-white/20 font-bold'
-                  : 'text-white/60 hover:text-white'
-              }`}
-              title="Vue carte"
-            >
-              <Map className="w-3.5 h-3.5 stroke-[2]" />
-              <span>Carte</span>
+              Annuler
             </button>
           </div>
-
-          {/* Bouton Favoris Liquid Glass */}
-          <button
-            onClick={onToggleFavoritesOnly}
-            className={`h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-2xl text-xs font-medium flex items-center gap-1.5 shrink-0 transition active:scale-95 ${
-              showFavoritesOnly
-                ? 'bg-[#FF9500]/25 text-[#FF9F0A] border border-[#FF9500]/50 shadow-[0_0_12px_rgba(255,149,0,0.35)]'
-                : 'liquid-glass-pill text-white/60 hover:text-white hover:bg-white/[0.14]'
-            }`}
-            title="Afficher les favoris"
-          >
-            <Star className={`w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2] ${showFavoritesOnly ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
-            {favoritesCount > 0 && (
-              <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
-                showFavoritesOnly ? 'bg-[#FF9500]/40 text-white' : 'bg-white/10 text-white/70'
-              }`}>
-                {favoritesCount}
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Champ de recherche pleine largeur sur Mobile, flex-1 sur Desktop */}
-        <div className="relative flex-1 min-w-0 order-1 sm:order-2">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none stroke-[2]" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') e.currentTarget.blur();
-            }}
-            placeholder="Rechercher une plage (Lafitenia, Cavaliers...)"
-            className="w-full h-10 pl-9 pr-9 liquid-glass-pill focus:border-sky-400 focus:bg-white/[0.12] rounded-2xl text-white placeholder-white/40 text-xs focus:outline-none transition shadow-inner"
-          />
-          {searchTerm && (
+        ) : (
+          <>
+            {/* Bouton Menu Commune */}
             <button
-              onClick={() => onSearchChange('')}
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-white/40 hover:text-white rounded-full active:bg-white/10 transition"
-              aria-label="Effacer recherche"
+              type="button"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`h-9 px-2.5 sm:px-3 rounded-2xl border flex items-center gap-1.5 text-xs font-semibold shrink-0 transition active:scale-95 ${
+                selectedTown !== 'ALL'
+                  ? 'bg-white text-black border-white shadow-sm'
+                  : 'liquid-glass-pill text-white hover:bg-white/[0.12]'
+              }`}
+              title="Choisir une commune"
             >
-              <X className="w-3.5 h-3.5 stroke-[2]" />
+              <MapPin className={`w-3.5 h-3.5 stroke-[2] ${selectedTown !== 'ALL' ? 'text-black' : 'text-[#38bdf8]'}`} />
+              <span className="max-w-[78px] sm:max-w-none truncate">{currentLabel}</span>
+              <ChevronDown className={`w-3 h-3 stroke-[2] transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
             </button>
-          )}
-        </div>
+
+            {/* Segmented Control Liste / Carte */}
+            <div className="flex items-center liquid-glass-pill rounded-2xl p-0.5 h-9 shrink-0">
+              <button
+                onClick={() => onViewModeChange('list')}
+                className={`h-7.5 px-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                  viewMode === 'list'
+                    ? 'bg-white/20 text-white shadow-sm font-bold border border-white/15'
+                    : 'text-white/60 hover:text-white'
+                }`}
+                title="Vue liste"
+              >
+                <LayoutList className="w-3.5 h-3.5 stroke-[2]" />
+                <span className="hidden xs:inline">Liste</span>
+              </button>
+
+              <button
+                onClick={() => onViewModeChange('map')}
+                className={`h-7.5 px-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                  viewMode === 'map'
+                    ? 'bg-white/20 text-white shadow-sm font-bold border border-white/15'
+                    : 'text-white/60 hover:text-white'
+                }`}
+                title="Vue carte"
+              >
+                <Map className="w-3.5 h-3.5 stroke-[2]" />
+                <span className="hidden xs:inline">Carte</span>
+              </button>
+            </div>
+
+            {/* Bouton Favoris */}
+            <button
+              onClick={onToggleFavoritesOnly}
+              className={`h-9 px-2.5 rounded-2xl text-xs font-medium flex items-center gap-1.5 shrink-0 transition active:scale-95 ${
+                showFavoritesOnly
+                  ? 'bg-[#FF9500]/25 text-[#FF9F0A] border border-[#FF9500]/50 shadow-[0_0_10px_rgba(255,149,0,0.3)]'
+                  : 'liquid-glass-pill text-white/60 hover:text-white'
+              }`}
+              title="Afficher les favoris"
+            >
+              <Star className={`w-3.5 h-3.5 stroke-[2] ${showFavoritesOnly ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
+              {favoritesCount > 0 && (
+                <span className={`text-[10px] apple-score px-1.5 py-0.2 rounded-md ${
+                  showFavoritesOnly ? 'bg-[#FF9500]/40 text-white' : 'bg-white/10 text-white/70'
+                }`}>
+                  {favoritesCount}
+                </span>
+              )}
+            </button>
+
+            {/* Bouton Loupe Dépliable sur Mobile */}
+            <button
+              onClick={() => setIsSearchExpandedMobile(true)}
+              className={`h-9 w-9 rounded-2xl flex sm:hidden items-center justify-center transition active:scale-95 shrink-0 ${
+                searchTerm 
+                  ? 'bg-sky-500/20 text-sky-400 border border-sky-400/40' 
+                  : 'liquid-glass-pill text-white/60 hover:text-white'
+              }`}
+              title="Rechercher un spot"
+            >
+              <Search className="w-3.5 h-3.5 stroke-[2]" />
+            </button>
+
+            {/* Champ de recherche Inline sur Tablette & Desktop */}
+            <div className="relative flex-1 min-w-0 hidden sm:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none stroke-[2]" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Rechercher une plage (Lafitenia, Cavaliers...)"
+                className="w-full h-9 pl-8.5 pr-8 rounded-2xl liquid-glass-pill focus:border-sky-400 focus:bg-white/[0.1] text-white placeholder-white/40 text-xs focus:outline-none transition"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => onSearchChange('')}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-white/40 hover:text-white rounded-full transition"
+                  aria-label="Effacer recherche"
+                >
+                  <X className="w-3 h-3 stroke-[2]" />
+                </button>
+              )}
+            </div>
+          </>
+        )}
 
       </div>
 
     </div>
   );
 };
+

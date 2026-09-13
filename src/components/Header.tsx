@@ -14,11 +14,17 @@ export const Header: React.FC<HeaderProps> = ({ tideData }) => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-13 py-2 gap-3">
           
-          {/* iOS Style Title with Basque Emblem */}
+          {/* iOS Style Title with Monochrome Basque Lauburu */}
           <div className="flex items-center space-x-2.5 shrink-0 select-none">
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.1]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#ef4444] shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+            <div className="w-8 h-8 rounded-full bg-white/[0.08] border border-white/[0.12] flex items-center justify-center shadow-inner">
+              <svg className="w-4.5 h-4.5 text-white/90" viewBox="0 0 100 100" fill="currentColor">
+                <g transform="translate(50,50)">
+                  <path d="M 0,0 A 25,25 0 0 1 0,-50 A 25,25 0 0 1 0,0 A 12.5,12.5 0 0 0 0,-25 A 12.5,12.5 0 0 1 0,0 Z" />
+                  <path d="M 0,0 A 25,25 0 0 1 0,-50 A 25,25 0 0 1 0,0 A 12.5,12.5 0 0 0 0,-25 A 12.5,12.5 0 0 1 0,0 Z" transform="rotate(90)" />
+                  <path d="M 0,0 A 25,25 0 0 1 0,-50 A 25,25 0 0 1 0,0 A 12.5,12.5 0 0 0 0,-25 A 12.5,12.5 0 0 1 0,0 Z" transform="rotate(180)" />
+                  <path d="M 0,0 A 25,25 0 0 1 0,-50 A 25,25 0 0 1 0,0 A 12.5,12.5 0 0 0 0,-25 A 12.5,12.5 0 0 1 0,0 Z" transform="rotate(270)" />
+                </g>
+              </svg>
             </div>
             <span className="font-bold tracking-tight text-white text-base sm:text-lg">
               Basque Surf

@@ -19,7 +19,9 @@ export function evaluateSpotConditions(spot: Spot, tide: TideData): SpotScore {
         label: 'Dangereux / Impraticable',
         explanation: 'La marée est trop haute. L’eau submerge totalement le sable et frappe la digue rocheuse.',
         matchQuality: 'dangerous',
-        warning: '⚠️ DANGER DIGUE : La plage a disparu. Risque sérieux de projection contre le mur de soutènement et les escaliers.',
+        warning: 'Danger Digue : La plage est totalement submergée. Risque de projection contre les enrochements et escaliers.',
+        hazardLevel: 'danger',
+        hazardChip: 'Danger Digue',
         bestWindowToday: findBestWindow(spot, hourlyCurve)
       };
     }
@@ -107,13 +109,18 @@ export function evaluateSpotConditions(spot: Spot, tide: TideData): SpotScore {
 
   const scoreFormatted = finalScore.toFixed(1).replace('.', ',');
 
+  const hazardLevel = spot.hazardLevel || 'caution';
+  const hazardChip = spot.hazardChip || (spot.level === 'Tous niveaux' ? 'Débutants' : 'Prudence');
+
   return {
     score: finalScore,
     scoreFormatted,
     label,
     explanation: explanation.trim(),
     matchQuality,
-    warning: spot.hazards ? spot.hazards : undefined,
+    hazardLevel,
+    hazardChip,
+    warning: hazardLevel === 'danger' ? spot.hazards : undefined,
     bestWindowToday: findBestWindow(spot, hourlyCurve)
   };
 }

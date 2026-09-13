@@ -6,6 +6,8 @@ export type SurfLevel = 'Tous niveaux' | 'Débutant' | 'Intermédiaire' | 'Confi
 
 export type BasqueTown = 'Anglet' | 'Biarritz' | 'Bidart' | 'Guéthary' | 'Saint-Jean-de-Luz' | 'Hendaye';
 
+export type HazardLevel = 'safe' | 'caution' | 'danger';
+
 export interface Spot {
   id: string;
   name: string;
@@ -20,6 +22,8 @@ export interface Spot {
   };
   tideDescription: string;
   hazards?: string;
+  hazardLevel?: HazardLevel;
+  hazardChip?: string;
   highTideRisk?: boolean;
   bestWind: string;
   bestSwell: string;
@@ -69,5 +73,8 @@ export interface SpotScore {
   explanation: string;
   matchQuality: TideMatchQuality;
   warning?: string;
+  hazardLevel: HazardLevel;
+  hazardChip: string;
   bestWindowToday?: string;
 }
+

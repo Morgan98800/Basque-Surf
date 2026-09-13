@@ -152,98 +152,128 @@ export const App: React.FC = () => {
   }, [selectedSpot, tidesByTown]);
 
   return (
-    <div className="min-h-screen bg-[#03070d] relative flex flex-col text-white selection:bg-[#007AFF] selection:text-white font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[#03070d] relative text-white selection:bg-[#007AFF] selection:text-white font-sans antialiased overflow-x-hidden">
       
-      {/* Orbes de lumière ambiante liquide (Liquid Ambient Glow) */}
-      <div className="fixed top-[-10%] left-[15%] w-[450px] h-[450px] rounded-full bg-gradient-to-br from-teal-500/15 via-sky-600/10 to-transparent blur-[120px] pointer-events-none -z-10" />
-      <div className="fixed top-[40%] right-[-10%] w-[500px] h-[500px] rounded-full bg-gradient-to-tl from-blue-600/15 via-indigo-500/10 to-transparent blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed bottom-[-5%] left-[-5%] w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-cyan-500/10 via-emerald-500/5 to-transparent blur-[120px] pointer-events-none -z-10" />
+      {/* Vrai Fond Lumineux Ambiant avec Dérive Continue (Ambient Orbs) */}
+      <div className="ambient-glow" />
 
-      {/* Barre supérieure iOS Liquid Glass */}
-      <Header tideData={activeHeaderTide} />
+      {/* Couche de Grain Subtile (Film Grain SVG) */}
+      <div className="noise-overlay" />
 
-      {/* Main Content avec padding-bottom pour la barre flottante inférieure */}
-      <main className="flex-1 max-w-5xl w-full max-w-full min-w-0 mx-auto px-4 sm:px-6 pt-3 pb-36 sm:pb-36 space-y-3 overflow-x-hidden">
+      {/* Racine de l'application avec recul de la vue parente pour les feuilles modales */}
+      <div className="app-root min-h-screen flex flex-col">
 
-        {/* Sélecteur de date hebdomadaire Apple Style (7 jours) */}
-        <DateSelector
-          selectedOffset={selectedDayOffset}
-          onSelectOffset={setSelectedDayOffset}
-        />
+        {/* Barre supérieure iOS Liquid Glass avec Lauburu */}
+        <Header tideData={activeHeaderTide} />
 
-        {/* Dynamic View: Map or List */}
-        {viewMode === 'map' ? (
-          <section className="space-y-2 animate-fade-in">
-            <SpotMap
-              spots={filteredSpots}
-              selectedSpot={selectedSpot}
-              onSelectSpot={(sp) => setSelectedSpot(sp)}
-              onOpenDetails={(sp) => setSelectedSpot(sp)}
-              onToggleFavorite={handleToggleFavorite}
-            />
-          </section>
-        ) : (
-          <section className="space-y-2.5 animate-fade-in">
-            {loading && Object.keys(tidesByTown).length === 0 ? (
-              <div className="py-20 text-center space-y-2.5">
-                <div className="w-6 h-6 border-2 border-[#007AFF] border-t-transparent rounded-full animate-spin mx-auto"></div>
-                <p className="text-xs text-white/50 font-medium">Chargement des conditions...</p>
-              </div>
-            ) : filteredSpots.length === 0 ? (
-              <div className="py-14 text-center bg-white/[0.04] border border-white/[0.08] rounded-3xl p-6 space-y-2 animate-slide-up">
-                <AlertCircle className="w-8 h-8 text-white/30 mx-auto stroke-[1.8]" />
-                <h3 className="text-sm font-semibold text-white">Aucun spot trouvé</h3>
-                <p className="text-xs text-white/50 max-w-xs mx-auto font-normal">
-                  {showFavoritesOnly 
-                    ? "Ajoutez des spots en favoris pour les retrouver ici."
-                    : "Essayez un autre mot clé ou sélectionnez une autre commune."}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
-                {filteredSpots.map(({ spot, score, tide, isFavorite }, index) => (
-                  <div
-                    key={spot.id}
-                    className="animate-fade-in"
-                    style={{
-                      animationDelay: `${Math.min(index * 30, 240)}ms`,
-                      animationFillMode: 'both',
-                    }}
-                  >
-                    <SpotCard
-                      spot={spot}
-                      score={score}
-                      tide={tide}
-                      isFavorite={isFavorite}
-                      isTop={index === 0 && !searchTerm && selectedTown === 'ALL' && !showFavoritesOnly}
-                      onToggleFavorite={handleToggleFavorite}
+        {/* Conteneur Principal : Mobile Single-Column / Desktop Split-View Apple Plans */}
+        <main className="flex-1 max-w-7xl w-full min-w-0 mx-auto px-3.5 sm:px-6 pt-3 pb-24 sm:pb-24 overflow-x-hidden">
+          
+          <div className="flex flex-col lg:flex-row gap-5 items-start w-full min-w-0">
+            
+            {/* Volet Gauche : Sélecteur 7 Jours + Liste de Spots (sur Desktop largeur fixe ~450px) */}
+            <div className="w-full min-w-0 lg:w-[450px] xl:w-[480px] shrink-0 space-y-3">
+              
+              {/* Sélecteur hebdomadaire 7 jours Apple */}
+              <DateSelector
+                selectedOffset={selectedDayOffset}
+                onSelectOffset={setSelectedDayOffset}
+              />
+
+              {/* Sur mobile : affichage carte si viewMode === 'map' */}
+              <div className="block lg:hidden">
+                {viewMode === 'map' ? (
+                  <section className="space-y-2 animate-fade-in">
+                    <SpotMap
+                      spots={filteredSpots}
+                      selectedSpot={selectedSpot}
                       onSelectSpot={(sp) => setSelectedSpot(sp)}
+                      onOpenDetails={(sp) => setSelectedSpot(sp)}
+                      onToggleFavorite={handleToggleFavorite}
                     />
-                  </div>
-                ))}
+                  </section>
+                ) : null}
               </div>
-            )}
-          </section>
-        )}
 
-      </main>
+              {/* Liste des spots : toujours visible sur Desktop, conditionnelle sur Mobile */}
+              <div className={`${viewMode === 'map' ? 'hidden lg:block' : 'block'}`}>
+                {loading && Object.keys(tidesByTown).length === 0 ? (
+                  <div className="py-20 text-center space-y-2.5">
+                    <div className="w-6 h-6 border-2 border-[#007AFF] border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <p className="text-xs text-white/50 font-medium">Chargement des conditions...</p>
+                  </div>
+                ) : filteredSpots.length === 0 ? (
+                  <div className="py-14 text-center bg-white/[0.04] border border-white/[0.08] rounded-3xl p-6 space-y-2 animate-slide-up">
+                    <AlertCircle className="w-8 h-8 text-white/30 mx-auto stroke-[1.8]" />
+                    <h3 className="text-sm font-semibold text-white">Aucun spot trouvé</h3>
+                    <p className="text-xs text-white/50 max-w-xs mx-auto font-normal">
+                      {showFavoritesOnly 
+                        ? "Ajoutez des spots en favoris pour les retrouver ici."
+                        : "Essayez un autre mot clé ou sélectionnez une autre commune."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {filteredSpots.map(({ spot, score, tide, isFavorite }, index) => (
+                      <div
+                        key={spot.id}
+                        onMouseEnter={() => setSelectedSpot(spot)}
+                        className="animate-fade-in"
+                        style={{
+                          animationDelay: `${Math.min(index * 25, 200)}ms`,
+                          animationFillMode: 'both',
+                        }}
+                      >
+                        <SpotCard
+                          spot={spot}
+                          score={score}
+                          tide={tide}
+                          isFavorite={isFavorite}
+                          isTop={index === 0 && !searchTerm && selectedTown === 'ALL' && !showFavoritesOnly}
+                          onToggleFavorite={handleToggleFavorite}
+                          onSelectSpot={(sp) => setSelectedSpot(sp)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-      {/* Barre d'action inférieure flottante style iOS Liquid Glass Dock */}
-      <nav className="fixed bottom-0 inset-x-0 z-40 liquid-glass-nav pb-[max(0.7rem,env(safe-area-inset-bottom))] pt-2.5">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <SearchBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            selectedTown={selectedTown}
-            onTownChange={setSelectedTown}
-            showFavoritesOnly={showFavoritesOnly}
-            onToggleFavoritesOnly={() => setShowFavoritesOnly(!showFavoritesOnly)}
-            favoritesCount={favorites.length}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-          />
-        </div>
-      </nav>
+            </div>
+
+            {/* Volet Droit Desktop : Carte Apple Plans Persistante */}
+            <div className="hidden lg:block flex-1 sticky top-16 h-[calc(100vh-100px)] rounded-[2rem] overflow-hidden liquid-glass-card border border-white/[0.12] shadow-2xl">
+              <SpotMap
+                spots={filteredSpots}
+                selectedSpot={selectedSpot}
+                onSelectSpot={(sp) => setSelectedSpot(sp)}
+                onOpenDetails={(sp) => setSelectedSpot(sp)}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            </div>
+
+          </div>
+
+        </main>
+
+        {/* Barre d'action inférieure flottante style iOS Liquid Glass Dock (1 Ligne Compacte) */}
+        <nav className="fixed bottom-0 inset-x-0 z-40 liquid-glass-nav pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2">
+          <div className="max-w-5xl mx-auto px-3.5 sm:px-6">
+            <SearchBar
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              selectedTown={selectedTown}
+              onTownChange={setSelectedTown}
+              showFavoritesOnly={showFavoritesOnly}
+              onToggleFavoritesOnly={() => setShowFavoritesOnly(!showFavoritesOnly)}
+              favoritesCount={favorites.length}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+            />
+          </div>
+        </nav>
+
+      </div>
 
       {/* Spot Detail Mobile Bottom Sheet / Modal */}
       {selectedSpot && selectedSpotTide && (

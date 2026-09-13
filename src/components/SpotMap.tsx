@@ -30,8 +30,9 @@ export const SpotMap: React.FC<SpotMapProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
+  const [currentZoom, setCurrentZoom] = useState<number>(12);
 
-  // Initialisation de la carte Leaflet
+  // Initialisation de la carte Leaflet avec CARTO Dark Matter
   useEffect(() => {
     if (!mapContainerRef.current) return;
     if (mapInstanceRef.current) return;
@@ -40,18 +41,24 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       center: BASQUE_CENTER,
       zoom: 12,
       minZoom: 11,
-      maxZoom: 16,
+      maxZoom: 17,
       maxBounds: BASQUE_BOUNDS,
       maxBoundsViscosity: 0.9,
       zoomControl: false,
     });
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap',
-      maxZoom: 18,
+    // Tuiles Esri World Dark Gray Canvas officielles (fond sombre profond, sans filigrane API)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; Esri &copy; OpenStreetMap',
+      maxZoom: 16,
     }).addTo(map);
 
     L.control.zoom({ position: 'topright' }).addTo(map);
+
+    map.on('zoomend', () => {
+      setCurrentZoom(map.getZoom());
+    });
+
     mapInstanceRef.current = map;
 
     return () => {
@@ -60,7 +67,7 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     };
   }, []);
 
-  // Mise à jour des marqueurs
+  // Mise à jour des marqueurs avec dé-encombrement intelligent
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
@@ -70,46 +77,50 @@ export const SpotMap: React.FC<SpotMapProps> = ({
 
     spots.forEach(({ spot, score, isFavorite }) => {
       const isSelected = selectedSpot?.id === spot.id;
+      const showName = isSelected || currentZoom >= 13;
 
-      let badgeBg = '#34C759'; // Vert iOS
-      if (score.matchQuality === 'dangerous') badgeBg = '#FF3B30'; // Rouge iOS
+      let badgeBg = '#30D158'; // Vert iOS
+      if (score.matchQuality === 'dangerous') badgeBg = '#FF453A'; // Rouge iOS
       else if (score.score < 5.0) badgeBg = '#8E8E93'; // Gris iOS
-      else if (score.score < 7.0) badgeBg = '#007AFF'; // Bleu iOS
+      else if (score.score < 7.0) badgeBg = '#0A84FF'; // Bleu iOS
+      else if (score.score < 8.0) badgeBg = '#38bdf8'; // Cyan iOS
 
       const html = `
         <div class="spot-marker ${isSelected ? 'marker-selected' : ''}" style="
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          background: rgba(28, 28, 30, 0.92);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1.5px solid ${isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.16)'};
+          background: ${isSelected ? 'rgba(28, 28, 30, 0.96)' : 'rgba(20, 22, 28, 0.88)'};
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid ${isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.16)'};
           border-radius: 9999px;
-          padding: 2.5px 8px 2.5px 3.5px;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.65);
+          padding: ${showName ? '2px 7px 2px 3px' : '2px 6px'};
+          box-shadow: 0 4px 18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.2);
           cursor: pointer;
           transform: translate(-50%, -50%) ${isSelected ? 'scale(1.15)' : 'scale(1)'};
-          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.25s var(--ease-io, ease), box-shadow 0.2s ease;
           white-space: nowrap;
-          font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+          font-family: ui-rounded, 'SF Pro Rounded', -apple-system, sans-serif;
         ">
           <span style="
             background: ${badgeBg};
             color: #FFFFFF;
             font-size: 11px;
             font-weight: 700;
-            font-family: -apple-system, monospace;
+            letter-spacing: -0.02em;
             padding: 1px 5px;
             border-radius: 9999px;
-            margin-right: 5px;
+            ${showName ? 'margin-right: 4px;' : ''}
           ">${score.scoreFormatted}</span>
-          <span style="
-            color: #FFFFFF;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-          ">${spot.name.split(' - ')[0]}</span>
-          ${isFavorite ? '<span style="color:#FF9500;margin-left:4px;font-size:10px;">★</span>' : ''}
+          ${showName ? `
+            <span style="
+              color: #FFFFFF;
+              font-size: 11px;
+              font-weight: 600;
+              letter-spacing: -0.01em;
+            ">${spot.name.split(' - ')[0]}</span>
+            ${isFavorite ? '<span style="color:#FF9F0A;margin-left:3px;font-size:10px;">★</span>' : ''}
+          ` : ''}
         </div>
       `;
 
@@ -129,7 +140,7 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       marker.addTo(map);
       markersRef.current.set(spot.id, marker);
     });
-  }, [spots, selectedSpot, onSelectSpot]);
+  }, [spots, selectedSpot, currentZoom, onSelectSpot]);
 
   useEffect(() => {
     if (selectedSpot && mapInstanceRef.current) {
