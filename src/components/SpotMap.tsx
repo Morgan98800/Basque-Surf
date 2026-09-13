@@ -71,8 +71,8 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     spots.forEach(({ spot, score, isFavorite }) => {
       const isSelected = selectedSpot?.id === spot.id;
 
-      let badgeBg = '#10b981';
-      if (score.matchQuality === 'dangerous') badgeBg = '#ef4444';
+      let badgeBg = '#14b8a6';
+      if (score.matchQuality === 'dangerous') badgeBg = '#f43f5e';
       else if (score.score < 5.0) badgeBg = '#64748b';
       else if (score.score < 7.0) badgeBg = '#0284c7';
 
@@ -80,33 +80,34 @@ export const SpotMap: React.FC<SpotMapProps> = ({
         <div class="spot-marker ${isSelected ? 'marker-selected' : ''}" style="
           display: flex;
           align-items: center;
-          background: #0b1624;
-          border: 2px solid ${isSelected ? '#38bdf8' : badgeBg};
+          background: #0e1822;
+          border: 1.5px solid ${isSelected ? '#2dd4bf' : '#1b2a38'};
           border-radius: 9999px;
-          padding: 2px 6px 2px 4px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+          padding: 2px 7px 2px 3px;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.6);
           cursor: pointer;
           transform: translate(-50%, -50%) ${isSelected ? 'scale(1.15)' : 'scale(1)'};
-          transition: transform 0.15s ease;
+          transition: all 0.2s ease;
           white-space: nowrap;
+          font-family: 'Outfit', sans-serif;
         ">
           <span style="
             background: ${badgeBg};
-            color: #ffffff;
+            color: #070d13;
             font-size: 11px;
             font-weight: 800;
             font-family: monospace;
-            padding: 1px 4px;
-            border-radius: 6px;
-            margin-right: 4px;
+            padding: 1px 5px;
+            border-radius: 9999px;
+            margin-right: 5px;
           ">${score.scoreFormatted}</span>
           <span style="
-            color: #f1f5f9;
-            font-size: 11px;
+            color: #f8fafc;
+            font-size: 12px;
             font-weight: 700;
             letter-spacing: -0.01em;
           ">${spot.name.split(' - ')[0]}</span>
-          ${isFavorite ? '<span style="color:#fbbf24;margin-left:3px;font-size:10px;">★</span>' : ''}
+          ${isFavorite ? '<span style="color:#fbbf24;margin-left:4px;font-size:10px;">★</span>' : ''}
         </div>
       `;
 
@@ -149,50 +150,50 @@ export const SpotMap: React.FC<SpotMapProps> = ({
   };
 
   return (
-    <div className="relative w-full h-[68vh] min-h-[460px] max-h-[720px] rounded-2xl overflow-hidden border border-nautical-750 shadow-xl flex flex-col">
+    <div className="relative w-full h-[68vh] min-h-[460px] max-h-[720px] rounded-2xl overflow-hidden border border-ocean-border shadow-xl flex flex-col">
       
       {/* Conteneur Leaflet */}
       <div ref={mapContainerRef} className="flex-1 w-full h-full z-10" />
 
       {/* Badge Côte Basque */}
-      <div className="absolute top-3 left-3 z-20 pointer-events-none bg-nautical-900/90 backdrop-blur-md border border-nautical-700 px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-2">
-        <Compass className="w-4 h-4 text-sky-400 shrink-0" />
-        <span className="text-xs font-bold text-white uppercase tracking-wider">
+      <div className="absolute top-3 left-3 z-20 pointer-events-none bg-ocean-dark/95 backdrop-blur-md border border-ocean-border px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+        <Compass className="w-4 h-4 text-wave-400 shrink-0 stroke-[2]" />
+        <span className="text-xs font-heading font-bold text-white uppercase tracking-wider">
           Spots Côte Basque (Anglet • Hendaye)
         </span>
       </div>
 
       {/* Fiche d'action flottante sous la carte */}
       {activeSpotData && (
-        <div className="absolute bottom-3 inset-x-3 sm:inset-x-6 z-20 bg-nautical-900/95 backdrop-blur-md border border-nautical-700 rounded-xl p-3 sm:p-3.5 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-slide-up">
+        <div className="absolute bottom-3 inset-x-3 sm:inset-x-6 z-20 bg-ocean-dark/95 backdrop-blur-md border border-ocean-border rounded-2xl p-3.5 sm:p-4 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-slide-up">
           
           {/* Infos spot */}
           <div className="flex items-start justify-between sm:justify-start gap-3 min-w-0">
             <div className="space-y-0.5 min-w-0">
-              <div className="flex items-center gap-2 text-[11px] font-semibold text-sky-400 uppercase tracking-wider truncate">
+              <div className="flex items-center gap-2 text-[11px] font-semibold text-wave-400 font-heading uppercase tracking-wider truncate">
                 <span>{activeSpotData.spot.town}</span>
-                <span>•</span>
+                <span className="text-slate-600">•</span>
                 <span className="truncate">{activeSpotData.spot.level}</span>
               </div>
-              <h4 className="font-bold text-white text-base truncate">
+              <h4 className="font-heading font-bold text-white text-base sm:text-lg truncate">
                 {activeSpotData.spot.name}
               </h4>
               <div className="flex items-center gap-1.5 text-xs text-slate-300">
-                <Clock className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                <Clock className="w-3.5 h-3.5 text-wave-400 shrink-0 stroke-[2]" />
                 <span>Créneau : <strong className="text-white font-mono">{activeSpotData.score.bestWindowToday || 'Journée'}</strong></span>
               </div>
             </div>
 
             {/* Note mobile */}
-            <div className="sm:hidden shrink-0 flex items-baseline gap-1 px-2.5 py-1 bg-nautical-800 border border-nautical-700 rounded-lg font-mono">
-              <span className="text-base font-extrabold text-emerald-400">{activeSpotData.score.scoreFormatted}</span>
+            <div className="sm:hidden shrink-0 flex items-baseline gap-1 px-3 py-1 bg-ocean-card border border-ocean-border rounded-xl font-mono">
+              <span className="text-base font-extrabold text-wave-400">{activeSpotData.score.scoreFormatted}</span>
               <span className="text-[10px] text-slate-400 font-bold">/10</span>
             </div>
           </div>
 
           {/* Note desktop */}
-          <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-nautical-800 border border-nautical-700 rounded-xl font-mono shrink-0">
-            <span className="text-lg font-extrabold text-emerald-400">{activeSpotData.score.scoreFormatted}</span>
+          <div className="hidden sm:flex items-center gap-1 px-3.5 py-1.5 bg-ocean-card border border-ocean-border rounded-xl font-mono shrink-0">
+            <span className="text-lg font-extrabold text-wave-400">{activeSpotData.score.scoreFormatted}</span>
             <span className="text-xs text-slate-400 font-bold">/10</span>
           </div>
 
@@ -202,27 +203,27 @@ export const SpotMap: React.FC<SpotMapProps> = ({
             {/* Favori */}
             <button
               onClick={() => onToggleFavorite(activeSpotData.spot.id)}
-              className="h-10 w-10 flex items-center justify-center rounded-xl bg-nautical-800 border border-nautical-700 text-slate-400 hover:text-amber-400 active:scale-95 transition"
+              className="h-10 w-10 flex items-center justify-center rounded-xl bg-ocean-card border border-ocean-border text-slate-400 hover:text-amber-400 active:scale-95 transition"
               aria-label="Favori"
             >
-              <Star className={`w-4 h-4 ${activeSpotData.isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} />
+              <Star className={`w-4 h-4 stroke-[1.8] ${activeSpotData.isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} />
             </button>
 
             {/* Fiche & Marée */}
             <button
               onClick={() => onOpenDetails(activeSpotData.spot)}
-              className="h-10 px-3.5 rounded-xl bg-nautical-800 hover:bg-nautical-750 border border-nautical-700 text-slate-200 text-xs font-semibold flex items-center gap-1 active:scale-95 transition"
+              className="h-10 px-3.5 rounded-xl bg-ocean-card hover:bg-ocean-hover border border-ocean-border text-slate-200 text-xs font-semibold flex items-center gap-1 active:scale-95 transition font-heading"
             >
               <span>Marée & Fiche</span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400 stroke-[2]" />
             </button>
 
             {/* Bouton GPS unique & puissant */}
             <button
               onClick={() => openGPS(activeSpotData.spot.lat, activeSpotData.spot.lon, activeSpotData.spot.name)}
-              className="h-10 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition"
+              className="h-10 px-4 rounded-xl bg-wave-500 hover:bg-wave-400 text-ocean-dark text-xs font-heading font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition"
             >
-              <Navigation className="w-3.5 h-3.5 fill-white" />
+              <Navigation className="w-3.5 h-3.5 fill-ocean-dark stroke-ocean-dark" />
               <span>Y aller</span>
             </button>
 

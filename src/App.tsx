@@ -132,7 +132,7 @@ export const App: React.FC = () => {
   }, [selectedSpot, tidesByTown]);
 
   return (
-    <div className="min-h-screen bg-nautical-900 flex flex-col text-slate-100">
+    <div className="min-h-screen bg-ocean-dark flex flex-col text-slate-100 selection:bg-wave-500 selection:text-ocean-dark font-sans">
       
       {/* Barre supérieure ultra-fine : Marque + Marée live IFREMER/SHOM */}
       <Header tideData={activeHeaderTide} />
@@ -143,7 +143,7 @@ export const App: React.FC = () => {
         {/* Dynamic View: Map or List */}
         {viewMode === 'map' ? (
           <section className="space-y-2">
-            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 font-heading">
               <span>Carte interactive ({filteredSpots.length} spots)</span>
               <span className="text-slate-500 font-mono">Anglet • Hendaye</span>
             </div>
@@ -158,7 +158,7 @@ export const App: React.FC = () => {
           </section>
         ) : (
           <section className="space-y-2">
-            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 font-heading">
               <span>
                 {filteredSpots.length} {filteredSpots.length > 1 ? 'spots classés par note' : 'spot'}
                 {selectedTown !== 'ALL' && ` à ${selectedTown}`}
@@ -171,21 +171,21 @@ export const App: React.FC = () => {
 
             {loading && Object.keys(tidesByTown).length === 0 ? (
               <div className="py-16 text-center space-y-2">
-                <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                <p className="text-xs text-slate-400">Chargement des marées...</p>
+                <div className="w-6 h-6 border-2 border-wave-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-xs text-slate-400 font-heading">Chargement des marées...</p>
               </div>
             ) : filteredSpots.length === 0 ? (
-              <div className="py-12 text-center bg-nautical-850 border border-nautical-750 rounded-xl p-6 space-y-2">
-                <AlertCircle className="w-8 h-8 text-slate-500 mx-auto" />
-                <h3 className="text-sm font-semibold text-slate-200">Aucun spot trouvé</h3>
-                <p className="text-xs text-slate-400 max-w-xs mx-auto">
+              <div className="py-12 text-center bg-ocean-card border border-ocean-border rounded-2xl p-6 space-y-2">
+                <AlertCircle className="w-8 h-8 text-slate-500 mx-auto stroke-[1.8]" />
+                <h3 className="text-sm font-heading font-semibold text-slate-200">Aucun spot trouvé</h3>
+                <p className="text-xs text-slate-400 max-w-xs mx-auto font-normal">
                   {showFavoritesOnly 
                     ? "Ajoutez des spots en favoris en cliquant sur l'étoile pour les retrouver ici."
                     : "Essayez un autre mot clé ou sélectionnez une autre commune."}
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
                 {filteredSpots.map(({ spot, score, tide, isFavorite }, index) => (
                   <SpotCard
                     key={spot.id}
@@ -206,7 +206,7 @@ export const App: React.FC = () => {
       </main>
 
       {/* Dock inférieur ergonomique (Thumb Zone pour smartphone) */}
-      <nav className="fixed bottom-0 inset-x-0 z-40 bg-nautical-900/95 backdrop-blur-md border-t border-nautical-750/90 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(0,0,0,0.5)]">
+      <nav className="fixed bottom-0 inset-x-0 z-40 bg-ocean-dark/95 backdrop-blur-md border-t border-ocean-border pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(0,0,0,0.6)]">
         <div className="max-w-5xl mx-auto px-3.5 sm:px-6">
           <SearchBar
             searchTerm={searchTerm}
@@ -223,16 +223,16 @@ export const App: React.FC = () => {
       </nav>
 
       {/* Clean Footer */}
-      <footer className="border-t border-nautical-800 bg-nautical-950 py-4 text-[11px] text-slate-400 mb-24 sm:mb-20">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
+      <footer className="border-t border-ocean-border bg-ocean-dark/80 py-4 text-[11px] text-slate-400 mb-24 sm:mb-20">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left font-heading">
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-sm bg-ikurrina-red"></span>
-            <span className="font-bold text-slate-300">BASQUE SURF</span>
+            <span className="w-2 h-2 rounded-full bg-ikurrina-red shadow-[0_0_8px_rgba(220,38,38,0.6)]"></span>
+            <span className="font-extrabold text-white tracking-wider">BASQUE SURF</span>
             <span className="text-slate-600">•</span>
-            <span>Anglet à Hendaye</span>
+            <span className="font-sans text-slate-400">Anglet à Hendaye</span>
           </div>
 
-          <div className="text-slate-500">
+          <div className="text-slate-500 font-sans">
             Données marées officielles CoefMarée (IFREMER / SHOM)
           </div>
         </div>

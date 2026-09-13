@@ -33,10 +33,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 hide-scrollbar -mx-3.5 px-3.5 sm:mx-0 sm:px-0">
         <button
           onClick={() => onTownChange('ALL')}
-          className={`h-7 px-3 rounded-full text-xs whitespace-nowrap font-medium transition shrink-0 ${
+          className={`h-7 px-3.5 rounded-full text-xs whitespace-nowrap font-medium transition shrink-0 ${
             selectedTown === 'ALL'
-              ? 'bg-sky-500 text-white font-bold shadow-sm'
-              : 'bg-nautical-800/80 text-slate-400 hover:text-slate-200 border border-nautical-750'
+              ? 'bg-wave-500 text-ocean-dark font-bold shadow-[0_2px_10px_rgba(20,184,166,0.3)]'
+              : 'bg-ocean-card text-slate-400 hover:text-slate-200 border border-ocean-border hover:border-slate-600'
           }`}
         >
           Tous ({selectedTown === 'ALL' ? 'Côte Basque' : 'Tous'})
@@ -46,10 +46,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           <button
             key={town}
             onClick={() => onTownChange(town)}
-            className={`h-7 px-3 rounded-full text-xs whitespace-nowrap font-medium transition shrink-0 ${
+            className={`h-7 px-3.5 rounded-full text-xs whitespace-nowrap font-medium transition shrink-0 ${
               selectedTown === town
-                ? 'bg-sky-500 text-white font-bold shadow-sm'
-                : 'bg-nautical-800/80 text-slate-400 hover:text-slate-200 border border-nautical-750'
+                ? 'bg-wave-500 text-ocean-dark font-bold shadow-[0_2px_10px_rgba(20,184,166,0.3)]'
+                : 'bg-ocean-card text-slate-400 hover:text-slate-200 border border-ocean-border hover:border-slate-600'
             }`}
           >
             {town}
@@ -62,13 +62,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         
         {/* Champ de recherche compact (h-10) */}
         <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none stroke-[1.75]" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Chercher une plage (Lafitenia, Cavaliers...)"
-            className="w-full h-10 pl-9 pr-8 bg-nautical-850/90 border border-nautical-700 focus:border-sky-500 rounded-xl text-slate-100 placeholder-slate-400 text-xs focus:outline-none transition shadow-inner"
+            className="w-full h-10 pl-10 pr-8 bg-ocean-card border border-ocean-border focus:border-wave-500 rounded-xl text-slate-100 placeholder-slate-400 text-xs focus:outline-none transition shadow-inner"
           />
           {searchTerm && (
             <button
@@ -76,37 +76,37 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-200"
               aria-label="Effacer recherche"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5 stroke-[2]" />
             </button>
           )}
         </div>
 
         {/* Bascule Vue : Liste / Carte (Segmenté compact h-10) */}
-        <div className="flex items-center bg-nautical-850/90 border border-nautical-700 rounded-xl p-1 h-10 shrink-0">
+        <div className="flex items-center bg-ocean-card border border-ocean-border rounded-xl p-1 h-10 shrink-0 shadow-sm">
           <button
             onClick={() => onViewModeChange('list')}
             className={`h-8 px-2.5 sm:px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               viewMode === 'list'
-                ? 'bg-sky-600 text-white shadow-sm'
+                ? 'bg-wave-500 text-ocean-dark font-bold shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
             title="Vue liste"
           >
-            <LayoutList className="w-4 h-4" />
-            <span className="hidden sm:inline">Liste</span>
+            <LayoutList className="w-3.5 h-3.5 stroke-[2]" />
+            <span className="hidden sm:inline font-heading">Liste</span>
           </button>
 
           <button
             onClick={() => onViewModeChange('map')}
             className={`h-8 px-2.5 sm:px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               viewMode === 'map'
-                ? 'bg-sky-600 text-white shadow-sm'
+                ? 'bg-wave-500 text-ocean-dark font-bold shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
             title="Vue carte"
           >
-            <Map className="w-4 h-4" />
-            <span className="hidden sm:inline">Carte</span>
+            <Map className="w-3.5 h-3.5 stroke-[2]" />
+            <span className="hidden sm:inline font-heading">Carte</span>
           </button>
         </div>
 
@@ -116,14 +116,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           className={`h-10 px-3 rounded-xl text-xs font-medium flex items-center gap-1.5 shrink-0 border transition active:scale-95 ${
             showFavoritesOnly
               ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-              : 'bg-nautical-850/90 text-slate-400 border-nautical-700 hover:text-slate-200'
+              : 'bg-ocean-card text-slate-400 border-ocean-border hover:text-slate-200 hover:border-slate-600'
           }`}
           title="Afficher les favoris"
         >
-          <Star className={`w-4 h-4 ${showFavoritesOnly ? 'fill-amber-400 text-amber-400' : ''}`} />
+          <Star className={`w-4 h-4 stroke-[2] ${showFavoritesOnly ? 'fill-amber-400 text-amber-400' : ''}`} />
           {favoritesCount > 0 && (
             <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
-              showFavoritesOnly ? 'bg-amber-400/30 text-amber-200' : 'bg-nautical-750 text-slate-300'
+              showFavoritesOnly ? 'bg-amber-400/30 text-amber-200' : 'bg-ocean-hover text-slate-300'
             }`}>
               {favoritesCount}
             </span>
