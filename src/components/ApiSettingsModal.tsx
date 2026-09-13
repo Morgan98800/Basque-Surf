@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ApiSettings } from '../types';
+import { ApiSettings } from '../types/index';
 import { saveApiSettings } from '../services/tides';
-import { X, Key, CheckCircle2, ShieldCheck, HelpCircle, RefreshCw } from 'lucide-react';
+import { X, Key, CheckCircle2, ShieldCheck, Sparkles, RefreshCw } from 'lucide-react';
 
 interface ApiSettingsModalProps {
   isOpen: boolean;
@@ -17,7 +17,7 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
   onSave,
 }) => {
   const [apiKey, setApiKey] = useState(currentSettings.apiKey);
-  const [provider, setProvider] = useState<'stormglass' | 'worldtides' | 'openmeteo' | 'auto'>(currentSettings.provider);
+  const [provider, setProvider] = useState<'coefmaree' | 'stormglass' | 'worldtides'>(currentSettings.provider || 'coefmaree');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   if (!isOpen) return null;
@@ -27,7 +27,7 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
     const updated: ApiSettings = {
       apiKey: apiKey.trim(),
       provider,
-      enabled: apiKey.trim().length > 0
+      enabled: provider === 'coefmaree' ? true : apiKey.trim().length > 0
     };
     saveApiSettings(updated);
     onSave(updated);
@@ -35,18 +35,7 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
     setTimeout(() => {
       setSavedSuccess(false);
       onClose();
-    }, 900);
-  };
-
-  const handleClear = () => {
-    setApiKey('');
-    const updated: ApiSettings = {
-      apiKey: '',
-      provider: 'stormglass',
-      enabled: false
-    };
-    saveApiSettings(updated);
-    onSave(updated);
+    }, 800);
   };
 
   return (
@@ -58,12 +47,12 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <div className="p-2 rounded-lg bg-ocean-500/10 text-ocean-400 border border-ocean-500/20">
               <Key className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Configuration de l'API</h3>
-              <p className="text-xs text-slate-400">Marées de la Côte Basque</p>
+              <h3 className="text-base font-bold text-white">Source & API Marées</h3>
+              <p className="text-xs text-slate-400">Côte Basque (Anglet à Hendaye)</p>
             </div>
           </div>
           <button
@@ -77,62 +66,54 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
         {/* Content & Form */}
         <form onSubmit={handleSave} className="space-y-4 pt-4">
           
-          <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300 leading-relaxed space-y-1.5">
-            <div className="flex items-center space-x-1.5 text-ocean-400 font-medium">
-              <ShieldCheck className="w-4 h-4 shrink-0" />
-              <span>Mode automatique sécurisé</span>
-            </div>
-            <p>
-              Sans clé API renseignée, l'application utilise le modèle astronomique harmonique de la côte basque (Biarritz/Socoa/Bayonne). Dès que vous collez votre clé ici, les marées en direct sont interrogées.
-            </p>
-          </div>
-
           {/* Provider Select */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-300">
-              Fournisseur d'API
+              Fournisseur de données marées
             </label>
             <select
               value={provider}
               onChange={(e) => setProvider(e.target.value as any)}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:ring-2 focus:ring-ocean-500 transition cursor-pointer"
             >
-              <option value="stormglass">Stormglass.io (Recommandé pour le surf)</option>
-              <option value="worldtides">WorldTides API</option>
+              <option value="coefmaree">🌊 CoefMarée (Recommandé : Gratuit, Sans clé, Atlas IFREMER/SHOM)</option>
+              <option value="stormglass">⚡ Stormglass.io (Requiert une clé API)</option>
+              <option value="worldtides">🌐 WorldTides API (Requiert une clé API)</option>
             </select>
           </div>
 
-          {/* API Key Input */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-300">
-                Clé API
-              </label>
-              {apiKey && (
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  className="text-[11px] text-rose-400 hover:underline"
-                >
-                  Effacer la clé
-                </button>
-              )}
+          {/* Details on selected provider */}
+          {provider === 'coefmaree' ? (
+            <div className="p-3.5 rounded-xl bg-ocean-950/60 border border-ocean-800/80 text-xs text-slate-300 space-y-2">
+              <div className="flex items-center space-x-1.5 text-ocean-300 font-semibold">
+                <Sparkles className="w-4 h-4 text-ocean-400" />
+                <span>API Développeur CoefMarée active</span>
+              </div>
+              <p className="text-slate-300 leading-relaxed text-[11px]">
+                Fournit les prédictions calculées à partir de l'atlas harmonique <strong>IFREMER / PREVIMER</strong> et calibrées sur les marégraphes officiels <strong>SHOM / REFMAR</strong>.
+              </p>
+              <div className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>100% Gratuit, sans clé API requise, requêtes CORS directes autorisées.</span>
+              </div>
             </div>
-            <input
-              type="text"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Collez votre clé API ici..."
-              className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 font-mono focus:outline-none focus:ring-2 focus:ring-ocean-500 transition"
-            />
-            <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-1">
-              <HelpCircle className="w-3 h-3" />
-              La clé est stockée localement dans votre navigateur (`localStorage`).
-            </p>
-          </div>
+          ) : (
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">
+                Clé API {provider === 'stormglass' ? 'Stormglass' : 'WorldTides'}
+              </label>
+              <input
+                type="text"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="Collez votre clé API ici..."
+                className="w-full px-3.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 font-mono focus:outline-none focus:ring-2 focus:ring-ocean-500 transition"
+              />
+            </div>
+          )}
 
           {/* Buttons */}
-          <div className="flex items-center justify-end space-x-2 pt-2">
+          <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-800">
             <button
               type="button"
               onClick={onClose}
@@ -152,7 +133,7 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
               ) : (
                 <>
                   <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Sauvegarder & Actualiser</span>
+                  <span>Appliquer</span>
                 </>
               )}
             </button>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TideData } from '../types';
+import { TideData } from '../types/index';
 import { Waves, Key, Compass, ArrowUpRight, ArrowDownRight, Droplets } from 'lucide-react';
 
 interface HeaderProps {
@@ -41,9 +41,9 @@ export const Header: React.FC<HeaderProps> = ({ tideData, onOpenSettings, favori
               <button
                 onClick={onOpenSettings}
                 className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition"
-                title="Configuration Clé API"
+                title="Source & API des Marées"
               >
-                <Key className="w-4 h-4" />
+                <Key className="w-4 h-4 text-amber-400" />
               </button>
             </div>
           </div>
@@ -52,6 +52,12 @@ export const Header: React.FC<HeaderProps> = ({ tideData, onOpenSettings, favori
           {tideData && (
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
               
+              {/* Ville affichée */}
+              <div className="hidden lg:flex items-center space-x-1.5 bg-slate-800/80 border border-slate-700/60 rounded-lg px-2.5 py-1.5 text-slate-300">
+                <span className="text-slate-400 font-medium">Référence :</span>
+                <span className="font-semibold text-white">{tideData.townName}</span>
+              </div>
+
               {/* Hauteur actuelle */}
               <div className="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5">
                 <Droplets className="w-3.5 h-3.5 text-ocean-400" />
@@ -89,18 +95,15 @@ export const Header: React.FC<HeaderProps> = ({ tideData, onOpenSettings, favori
                 </span>
               </div>
 
-              {/* API Key settings button (desktop) */}
+              {/* Source button (desktop) */}
               <button
                 onClick={onOpenSettings}
                 className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition text-xs font-medium"
               >
-                <Key className="w-3.5 h-3.5 text-amber-400" />
-                <span>{tideData.isExternalApi ? 'API Active' : 'Clé API'}</span>
-                {tideData.isExternalApi && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                )}
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>API : CoefMarée</span>
                 {favoritesCount > 0 && (
-                  <span className="ml-1 px-1.5 py-0.2 rounded-full bg-slate-700 text-[10px] text-amber-300">
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full bg-slate-750 text-[10px] text-amber-300">
                     ★ {favoritesCount}
                   </span>
                 )}

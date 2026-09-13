@@ -1,11 +1,21 @@
 import { Spot, BasqueTown } from '../types/index';
 
+export const TOWN_TO_SLUG: Record<BasqueTown, string> = {
+  'Anglet': 'anglet',
+  'Biarritz': 'biarritz',
+  'Bidart': 'bidart',
+  'Guéthary': 'guethary',
+  'Saint-Jean-de-Luz': 'saint-jean-de-luz',
+  'Hendaye': 'hendaye'
+};
+
 export const BASQUE_SPOTS: Spot[] = [
   // --- ANGLET ---
   {
     id: 'anglet-cavaliers',
     name: 'Les Cavaliers',
     town: 'Anglet',
+    coefMareeSlug: 'anglet',
     type: 'beach_break',
     level: 'Confirmé',
     optimalTideRange: {
@@ -25,6 +35,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'anglet-chambre-amour',
     name: "La Chambre d'Amour (VVF)",
     town: 'Anglet',
+    coefMareeSlug: 'anglet',
     type: 'beach_break',
     level: 'Intermédiaire',
     optimalTideRange: {
@@ -44,6 +55,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'anglet-marinella',
     name: 'Marinella',
     town: 'Anglet',
+    coefMareeSlug: 'anglet',
     type: 'beach_break',
     level: 'Tous niveaux',
     optimalTideRange: {
@@ -63,6 +75,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'anglet-corsaires',
     name: 'Les Corsaires',
     town: 'Anglet',
+    coefMareeSlug: 'anglet',
     type: 'beach_break',
     level: 'Intermédiaire',
     optimalTideRange: {
@@ -82,6 +95,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'anglet-madrague',
     name: 'La Madrague',
     town: 'Anglet',
+    coefMareeSlug: 'anglet',
     type: 'beach_break',
     level: 'Intermédiaire',
     optimalTideRange: {
@@ -101,6 +115,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'anglet-la-barre',
     name: 'La Barre',
     town: 'Anglet',
+    coefMareeSlug: 'anglet',
     type: 'beach_break',
     level: 'Tous niveaux',
     optimalTideRange: {
@@ -122,6 +137,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'biarritz-cote-des-basques',
     name: 'Côte des Basques',
     town: 'Biarritz',
+    coefMareeSlug: 'biarritz',
     type: 'beach_break',
     level: 'Tous niveaux',
     highTideRisk: true,
@@ -142,6 +158,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'biarritz-grande-plage',
     name: 'Grande Plage',
     town: 'Biarritz',
+    coefMareeSlug: 'biarritz',
     type: 'beach_break',
     level: 'Intermédiaire',
     optimalTideRange: {
@@ -161,6 +178,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'biarritz-miramar',
     name: 'Miramar',
     town: 'Biarritz',
+    coefMareeSlug: 'biarritz',
     type: 'beach_break',
     level: 'Confirmé',
     optimalTideRange: {
@@ -180,6 +198,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'biarritz-marbella',
     name: 'Marbella',
     town: 'Biarritz',
+    coefMareeSlug: 'biarritz',
     type: 'beach_break',
     level: 'Confirmé',
     optimalTideRange: {
@@ -199,6 +218,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'biarritz-milady',
     name: 'La Milady',
     town: 'Biarritz',
+    coefMareeSlug: 'biarritz',
     type: 'beach_break',
     level: 'Intermédiaire',
     optimalTideRange: {
@@ -220,6 +240,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'bidart-ilbarritz',
     name: 'Ilbarritz',
     town: 'Bidart',
+    coefMareeSlug: 'bidart',
     type: 'beach_break',
     level: 'Tous niveaux',
     optimalTideRange: {
@@ -239,6 +260,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'bidart-erretegia',
     name: 'Erretegia',
     town: 'Bidart',
+    coefMareeSlug: 'bidart',
     type: 'beach_break',
     level: 'Intermédiaire',
     optimalTideRange: {
@@ -258,6 +280,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'bidart-centre',
     name: 'Bidart Centre',
     town: 'Bidart',
+    coefMareeSlug: 'bidart',
     type: 'beach_break',
     level: 'Tous niveaux',
     optimalTideRange: {
@@ -277,6 +300,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'bidart-uhabia',
     name: 'Uhabia',
     town: 'Bidart',
+    coefMareeSlug: 'bidart',
     type: 'beach_break',
     level: 'Intermédiaire',
     optimalTideRange: {
@@ -298,6 +322,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'guethary-parlementia',
     name: 'Parlementia',
     town: 'Guéthary',
+    coefMareeSlug: 'guethary',
     type: 'reef_break',
     level: 'Confirmé',
     optimalTideRange: {
@@ -317,6 +342,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'guethary-cenitz',
     name: 'Cenitz',
     town: 'Guéthary',
+    coefMareeSlug: 'guethary',
     type: 'reef_break',
     level: 'Intermédiaire',
     optimalTideRange: {
@@ -336,6 +362,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'guethary-alcyons',
     name: 'Les Alcyons',
     town: 'Guéthary',
+    coefMareeSlug: 'guethary',
     type: 'reef_break',
     level: 'Expert',
     optimalTideRange: {
@@ -357,6 +384,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'st-jean-lafitenia',
     name: 'Lafitenia',
     town: 'Saint-Jean-de-Luz',
+    coefMareeSlug: 'saint-jean-de-luz',
     type: 'point_break',
     level: 'Confirmé',
     optimalTideRange: {
@@ -376,6 +404,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'st-jean-erromardie',
     name: 'Erromardie',
     town: 'Saint-Jean-de-Luz',
+    coefMareeSlug: 'saint-jean-de-luz',
     type: 'reef_break',
     level: 'Intermédiaire',
     optimalTideRange: {
@@ -395,6 +424,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'st-jean-sainte-barbe',
     name: 'Sainte-Barbe / Baie',
     town: 'Saint-Jean-de-Luz',
+    coefMareeSlug: 'saint-jean-de-luz',
     type: 'point_break',
     level: 'Tous niveaux',
     optimalTideRange: {
@@ -416,6 +446,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'hendaye-plage',
     name: 'Hendaye - Les Deux Jumeaux',
     town: 'Hendaye',
+    coefMareeSlug: 'hendaye',
     type: 'beach_break',
     level: 'Tous niveaux',
     optimalTideRange: {
@@ -435,6 +466,7 @@ export const BASQUE_SPOTS: Spot[] = [
     id: 'hendaye-casino',
     name: 'Hendaye - Le Casino',
     town: 'Hendaye',
+    coefMareeSlug: 'hendaye',
     type: 'beach_break',
     level: 'Débutant',
     optimalTideRange: {

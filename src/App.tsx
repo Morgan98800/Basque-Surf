@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BASQUE_SPOTS } from './data/spots';
+import { BASQUE_SPOTS, TOWN_TO_SLUG } from './data/spots';
 import { Spot, TideData, BasqueTown, ApiSettings } from './types/index';
 import { fetchTideData, getSavedApiSettings } from './services/tides';
 import { evaluateSpotConditions } from './services/scoring';
@@ -8,12 +8,12 @@ import { SearchBar } from './components/SearchBar';
 import { SpotCard } from './components/SpotCard';
 import { SpotDetailModal } from './components/SpotDetailModal';
 import { ApiSettingsModal } from './components/ApiSettingsModal';
-import { Waves, Sparkles, AlertCircle, Compass } from 'lucide-react';
+import { Waves, Sparkles, AlertCircle, Compass, ShieldCheck } from 'lucide-react';
 
 const FAVORITES_STORAGE_KEY = 'basque_surf_favorites';
 
 export const App: React.FC = () => {
-  const [tideData, setTideData] = useState<TideData | null>(null);
+  const [tidesByTown, setTidesByTown] = useState<Record<string, TideData>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [apiSettings, setApiSettings] = useState<ApiSettings>(getSavedApiSettings());
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
@@ -37,12 +37,33 @@ export const App: React.FC = () => {
     }
   });
 
-  // Chargement des données marées
-  const loadTides = async (settingsToUse?: ApiSettings) => {
+  // Chargement des données marées pour les villes de la Côte Basque
+  const loadAllTides = async (settingsToUse?: ApiSettings) => {
     setLoading(true);
+    const settings = settingsToUse || apiSettings;
+    const slugs = ['biarritz', 'anglet', 'bidart', 'guethary', 'saint-jean-de-luz', 'hendaye'];
+    const newTides: Record<string, TideData> = {};
+
     try {
-      const data = await fetchTideData(settingsToUse || apiSettings);
-      setTideData(data);
+      // Charger Biarritz en priorité pour affichage immédiat
+      const biarritzData = await fetchTideData('biarritz', settings);
+      newTides['biarritz'] = biarritzData;
+      setTidesByTown({ ...newTides });
+
+      // Charger les autres villes en parallèle
+      const others = slugs.filter(s => s !== 'biarritz');
+      const results = await Promise.allSettled(others.map(slug => fetchTideData(slug, settings)));
+      
+      results.forEach((res, index) => {
+        const slug = others[index];
+        if (res.status === 'fulfilled') {
+          newTides[slug] = res.value;
+        } else {
+          newTides[slug] = biarritzData; // fallback
+        }
+      });
+
+      setTidesByTown({ ...newTides });
     } catch (err) {
       console.error('Erreur chargement marées', err);
     } finally {
@@ -51,8 +72,8 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
-    loadTides();
-    const interval = setInterval(() => loadTides(), 5 * 60 * 1000); // Mise à jour toutes les 5 min
+    loadAllTides();
+    const interval = setInterval(() => loadAllTides(), 10 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -67,30 +88,38 @@ export const App: React.FC = () => {
     });
   };
 
-  // Calcul des scores pour chaque spot
+  // Marée active pour l'en-tête (dépend de la ville sélectionnée, ou Biarritz par défaut)
+  const activeHeaderTide = useMemo(() => {
+    if (selectedTown !== 'ALL') {
+      const slug = TOWN_TO_SLUG[selectedTown];
+      return tidesByTown[slug] || tidesByTown['biarritz'] || null;
+    }
+    return tidesByTown['biarritz'] || null;
+  }, [selectedTown, tidesByTown]);
+
+  // Calcul des scores pour chaque spot avec sa marée locale dédiée
   const spotsWithScores = useMemo(() => {
-    if (!tideData) return [];
+    const fallbackTide = tidesByTown['biarritz'];
+    if (!fallbackTide) return [];
+
     return BASQUE_SPOTS.map((spot) => {
-      const score = evaluateSpotConditions(spot, tideData);
+      const spotTide = tidesByTown[spot.coefMareeSlug] || fallbackTide;
+      const score = evaluateSpotConditions(spot, spotTide);
       return {
         spot,
         score,
+        tide: spotTide,
         isFavorite: favorites.includes(spot.id),
       };
     });
-  }, [tideData, favorites]);
+  }, [tidesByTown, favorites]);
 
   // Filtrage et Tri
   const filteredSpots = useMemo(() => {
     return spotsWithScores
       .filter(({ spot, isFavorite }) => {
-        // Filtre favoris
         if (showFavoritesOnly && !isFavorite) return false;
-
-        // Filtre ville
         if (selectedTown !== 'ALL' && spot.town !== selectedTown) return false;
-
-        // Filtre recherche
         if (searchTerm.trim()) {
           const query = searchTerm.toLowerCase().trim();
           const matchName = spot.name.toLowerCase().includes(query);
@@ -99,19 +128,12 @@ export const App: React.FC = () => {
           const matchLevel = spot.level.toLowerCase().includes(query);
           return matchName || matchTown || matchDesc || matchLevel;
         }
-
         return true;
       })
       .sort((a, b) => {
-        if (sortBy === 'score') {
-          return b.score.score - a.score.score;
-        }
-        if (sortBy === 'name') {
-          return a.spot.name.localeCompare(b.spot.name);
-        }
-        if (sortBy === 'town') {
-          return a.spot.town.localeCompare(b.spot.town);
-        }
+        if (sortBy === 'score') return b.score.score - a.score.score;
+        if (sortBy === 'name') return a.spot.name.localeCompare(b.spot.name);
+        if (sortBy === 'town') return a.spot.town.localeCompare(b.spot.town);
         return 0;
       });
   }, [spotsWithScores, searchTerm, selectedTown, showFavoritesOnly, sortBy]);
@@ -122,12 +144,18 @@ export const App: React.FC = () => {
     return [...spotsWithScores].sort((a, b) => b.score.score - a.score.score)[0];
   }, [spotsWithScores]);
 
+  // Marée pour le spot sélectionné dans le modal
+  const selectedSpotTide = useMemo(() => {
+    if (!selectedSpot) return null;
+    return tidesByTown[selectedSpot.coefMareeSlug] || tidesByTown['biarritz'] || null;
+  }, [selectedSpot, tidesByTown]);
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col text-slate-100">
       
       {/* Navigation Header */}
       <Header
-        tideData={tideData}
+        tideData={activeHeaderTide}
         onOpenSettings={() => setIsSettingsOpen(true)}
         favoritesCount={favorites.length}
       />
@@ -148,11 +176,11 @@ export const App: React.FC = () => {
             </h2>
 
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
-              Chaque plage de la côte basque réagit différemment à la marée : la Côte des Basques s’engloutit à marée haute, Lafitenia adore la marée basse, et Hendaye encaisse toutes les houles. Notre algorithme note chaque spot en direct avec précision.
+              Chaque plage de la côte basque réagit différemment à la marée : la Côte des Basques s’engloutit à marée haute, Lafitenia adore la marée basse, et Hendaye encaisse toutes les houles. Données en direct issues de l'atlas <strong>IFREMER/PREVIMER</strong> calibré <strong>SHOM/REFMAR</strong>.
             </p>
 
             {/* Quick Highlight Box */}
-            {topSpot && tideData && (
+            {topSpot && activeHeaderTide && (
               <div className="pt-2 flex flex-wrap items-center gap-3 text-xs">
                 <div 
                   onClick={() => setSelectedSpot(topSpot.spot)}
@@ -167,7 +195,7 @@ export const App: React.FC = () => {
 
                 <div className="text-slate-400 text-xs flex items-center gap-1.5">
                   <Compass className="w-3.5 h-3.5 text-ocean-400" />
-                  <span>Source marée : <strong className="text-slate-300">{tideData.apiSource}</strong></span>
+                  <span>Source marée : <strong className="text-slate-300">{activeHeaderTide.apiSource}</strong></span>
                 </div>
               </div>
             )}
@@ -203,14 +231,14 @@ export const App: React.FC = () => {
               {showFavoritesOnly && ' (Favoris uniquement)'}
             </span>
             <span className="text-[11px] text-slate-500 hidden sm:inline">
-              Cliquez sur une plage pour voir la courbe de marée
+              Cliquez sur une plage pour voir sa courbe de marée locale
             </span>
           </div>
 
-          {loading && !tideData ? (
+          {loading && Object.keys(tidesByTown).length === 0 ? (
             <div className="py-20 text-center space-y-3">
               <div className="w-8 h-8 border-3 border-ocean-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="text-sm text-slate-400">Évaluation des marées sur la côte basque...</p>
+              <p className="text-sm text-slate-400">Interrogation de l'API CoefMarée pour la Côte Basque...</p>
             </div>
           ) : filteredSpots.length === 0 ? (
             <div className="py-16 text-center bg-slate-900/40 border border-slate-800/60 rounded-2xl p-8 space-y-3">
@@ -232,12 +260,12 @@ export const App: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-              {filteredSpots.map(({ spot, score, isFavorite }) => (
+              {filteredSpots.map(({ spot, score, tide, isFavorite }) => (
                 <SpotCard
                   key={spot.id}
                   spot={spot}
                   score={score}
-                  tide={tideData!}
+                  tide={tide}
                   isFavorite={isFavorite}
                   onToggleFavorite={handleToggleFavorite}
                   onSelectSpot={(sp) => setSelectedSpot(sp)}
@@ -249,7 +277,7 @@ export const App: React.FC = () => {
 
       </main>
 
-      {/* Footer */}
+      {/* Footer with Attribution */}
       <footer className="mt-16 border-t border-slate-800 bg-slate-950 py-8 text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
@@ -259,24 +287,27 @@ export const App: React.FC = () => {
             <span>Anglet • Biarritz • Bidart • Guéthary • Saint-Jean-de-Luz • Hendaye</span>
           </div>
           
-          <div className="flex items-center space-x-4 text-slate-500">
-            <span>Notes sur 10 calculées selon marée & bathymétrie</span>
+          <div className="flex flex-wrap items-center gap-3 text-slate-400 text-[11px]">
+            <div className="flex items-center space-x-1.5 text-slate-400">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Données IFREMER/PREVIMER (CC-BY) · marégraphes SHOM/REFMAR via CoefMarée</span>
+            </div>
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="hover:text-slate-300 underline"
+              className="hover:text-slate-200 underline"
             >
-              Clé API & Réglages
+              Sources & API
             </button>
           </div>
         </div>
       </footer>
 
       {/* Spot Detail Modal */}
-      {selectedSpot && tideData && (
+      {selectedSpot && selectedSpotTide && (
         <SpotDetailModal
           spot={selectedSpot}
-          score={evaluateSpotConditions(selectedSpot, tideData)}
-          tide={tideData}
+          score={evaluateSpotConditions(selectedSpot, selectedSpotTide)}
+          tide={selectedSpotTide}
           isFavorite={favorites.includes(selectedSpot.id)}
           onToggleFavorite={handleToggleFavorite}
           onClose={() => setSelectedSpot(null)}
@@ -290,7 +321,7 @@ export const App: React.FC = () => {
         currentSettings={apiSettings}
         onSave={(newSettings) => {
           setApiSettings(newSettings);
-          loadTides(newSettings);
+          loadAllTides(newSettings);
         }}
       />
 

@@ -10,6 +10,7 @@ export interface Spot {
   id: string;
   name: string;
   town: BasqueTown;
+  coefMareeSlug: string; // 'anglet' | 'biarritz' | 'bidart' | 'guethary' | 'saint-jean-de-luz' | 'hendaye'
   type: SpotType;
   level: SurfLevel;
   optimalTideRange: {
@@ -33,6 +34,7 @@ export interface TideExtreme {
   timestamp: number;
   height: number; // en mètres
   type: 'low' | 'high';
+  coefficient?: number;
 }
 
 export interface TideHourlyPoint {
@@ -42,10 +44,12 @@ export interface TideHourlyPoint {
 }
 
 export interface TideData {
+  townSlug: string;
+  townName: string;
   currentHeight: number; // ex: 2.85
   currentPhase: TidePhase;
   phaseLabel: string; // "Mi-marée montante"
-  coefficient: number; // ex: 76
+  coefficient: number; // ex: 98
   nextHigh: TideExtreme;
   nextLow: TideExtreme;
   todayExtremes: TideExtreme[];
@@ -53,6 +57,7 @@ export interface TideData {
   isExternalApi: boolean;
   apiSource: string;
   lastUpdated: string;
+  attribution?: string;
 }
 
 export type TideMatchQuality = 'perfect' | 'good' | 'average' | 'poor' | 'dangerous';
@@ -69,6 +74,6 @@ export interface SpotScore {
 
 export interface ApiSettings {
   apiKey: string;
-  provider: 'stormglass' | 'worldtides' | 'openmeteo' | 'auto';
+  provider: 'coefmaree' | 'stormglass' | 'worldtides';
   enabled: boolean;
 }

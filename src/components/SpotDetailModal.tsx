@@ -1,6 +1,6 @@
 import React from 'react';
-import { Spot, SpotScore, TideData } from '../types';
-import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, MapPin, ExternalLink } from 'lucide-react';
+import { Spot, SpotScore, TideData } from '../types/index';
+import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, ExternalLink, ShieldCheck } from 'lucide-react';
 
 interface SpotDetailModalProps {
   spot: Spot | null;
@@ -104,12 +104,12 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
           </div>
 
           {/* Dangers & Alertes spécifiques */}
-          {spot.hazards && (
-            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start space-x-2.5">
-              <AlertTriangle className="w-5 h-5 shrink-0 text-amber-400 mt-0.5" />
+          {score.warning && (
+            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start space-x-2.5">
+              <AlertTriangle className="w-5 h-5 shrink-0 text-rose-400 mt-0.5" />
               <div>
-                <strong className="font-semibold block mb-0.5">Spécificités et dangers du spot :</strong>
-                <span className="leading-relaxed text-amber-200/90">{spot.hazards}</span>
+                <strong className="font-semibold block mb-0.5">Spécificités et sécurité :</strong>
+                <span className="leading-relaxed text-rose-200/90">{score.warning}</span>
               </div>
             </div>
           )}
@@ -119,7 +119,7 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
             <div className="flex items-center justify-between text-xs">
               <h4 className="font-semibold text-slate-200 flex items-center gap-1.5">
                 <Waves className="w-4 h-4 text-ocean-400" />
-                <span>Courbe des marées sur 24h</span>
+                <span>Courbe des marées sur 24h ({tide.townName})</span>
               </h4>
               <span className="text-slate-400 text-[11px]">
                 Zone optimale : <strong className="text-ocean-300">{spot.optimalTideRange.minHeight}m - {spot.optimalTideRange.maxHeight}m</strong>
@@ -129,7 +129,7 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
             <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
               <div className="h-28 flex items-end justify-between gap-1 pt-4 pb-1">
                 {tide.hourlyCurve.map((pt, idx) => {
-                  const hNormalized = Math.max(0.1, Math.min(1, (pt.height - 0.5) / 4.0)); // 0.5m à 4.5m
+                  const hNormalized = Math.max(0.1, Math.min(1, (pt.height - 0.5) / 4.0));
                   const isCurrent = idx === currentHour;
                   const isOptimal = pt.height >= spot.optimalTideRange.minHeight && pt.height <= spot.optimalTideRange.maxHeight;
 
@@ -220,11 +220,13 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
             </p>
           </div>
 
-          {/* Localisation GPS */}
-          <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-800 text-slate-400">
+          {/* Localisation GPS & Attribution */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs pt-3 border-t border-slate-800 text-slate-400 gap-2">
             <div className="flex items-center space-x-1.5">
-              <MapPin className="w-4 h-4 text-ocean-400" />
-              <span>Coordonnées : {spot.lat.toFixed(4)}, {spot.lon.toFixed(4)}</span>
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="text-[11px] text-slate-400">
+                {tide.attribution || 'Données IFREMER/PREVIMER · SHOM/REFMAR via CoefMarée'}
+              </span>
             </div>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lon}`}

@@ -23,9 +23,14 @@ Elle évalue en temps réel les conditions de surf en fonction des marées (haut
 - **Courbe visuelle de marée sur 24h** : Visualisez d'un coup d'œil les créneaux idéaux sur chaque spot.
 - **Recherche instantanée** : Filtrez par nom de plage, ville ou niveau de surf.
 - **Système de Favoris** : Enregistrez vos spots préférés d'un clic avec persistance dans le navigateur (`localStorage`).
-- **Gestionnaire de Clé API flexible** :
-  - Prêt à recevoir votre clé d'API (Stormglass, WorldTides, etc.) via le modal "Paramètres API" de l'interface ou via un fichier `.env`.
-  - En l'absence de clé, l'application utilise un modèle astronomique harmonique fidèle aux annuaires de marée officiels de la Côte Basque (Socoa/Biarritz) pour être **immédiatement utilisable à 100%**.
+- **Gestionnaire d'API & Marées en Direct** :
+  - Intégration native de l'**API Développeur CoefMarée** :
+    - **100% Gratuit, sans clé API requise, requêtes CORS autorisées**.
+    - Données calculées à partir de l'atlas harmonique **IFREMER / PREVIMER** et calibrées sur les marégraphes officiels **SHOM / REFMAR**.
+    - Données précises par ville/plage de la Côte Basque (`anglet`, `biarritz`, `bidart`, `guethary`, `saint-jean-de-luz`, `hendaye`).
+    - Horaires de pleine mer & basse mer, coefficients officiels, hauteur d'eau en direct et évolution de la marée.
+  - Support optionnel d'autres API (Stormglass, WorldTides) si souhaité.
+  - Modèle harmonique local de secours si perte de connexion réseau.
 
 ---
 
@@ -48,24 +53,18 @@ npm run build
 
 ---
 
-## 🔑 Configuration de la Clé API
+## 📡 Source des Données & Attribution
 
-Vous pouvez renseigner votre clé API de deux manières :
-1. **Directement dans le site** : Cliquez sur le bouton "Clé API" dans la barre du haut ou le pied de page, puis collez votre clé.
-2. **Via variable d'environnement** : Créez un fichier `.env` à la racine :
-   ```env
-   VITE_TIDE_API_KEY=votre_cle_api_ici
-   ```
+Les prédictions de marée sont fournies via l'API [CoefMarée](https://coefmaree.fr/api).
+*Attribution légale requise* : « Données IFREMER/PREVIMER (Pineau-Guillou, 2013, CC-BY) · marégraphes SHOM/REFMAR ».
 
 ---
 
 ## 🚀 Push sur GitHub
 
-Pour envoyer le projet sur votre dépôt GitHub :
+Pour synchroniser le projet :
 ```bash
 git add .
-git commit -m "feat: site Basque Surf avec évaluation des marées et favoris"
-git branch -M main
-git remote add origin https://github.com/Morgan98800/Basque-Surf.git
-git push -u origin main
+git commit -m "feat: integration CoefMaree API (IFREMER/SHOM) pour la Cote Basque"
+git push origin main
 ```
