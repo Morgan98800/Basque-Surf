@@ -5,6 +5,7 @@ import { fetchTideData } from './services/tides';
 import { evaluateSpotConditions } from './services/scoring';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
+import { DateSelector } from './components/DateSelector';
 import { SpotCard } from './components/SpotCard';
 import { SpotMap } from './components/SpotMap';
 import { SpotDetailModal } from './components/SpotDetailModal';
@@ -15,6 +16,9 @@ const FAVORITES_STORAGE_KEY = 'basque_surf_favorites';
 export const App: React.FC = () => {
   const [tidesByTown, setTidesByTown] = useState<Record<string, TideData>>({});
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Jour sélectionné : 0 = Aujourd'hui, 1 = Demain ... jusqu'à 6 (7 jours)
+  const [selectedDayOffset, setSelectedDayOffset] = useState<number>(0);
 
   // Vue : Liste ou Carte
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
@@ -37,19 +41,19 @@ export const App: React.FC = () => {
     }
   });
 
-  // Chargement des marées officielles de la Côte Basque
-  const loadAllTides = async () => {
+  // Chargement des marées officielles de la Côte Basque selon le jour choisi
+  const loadAllTides = async (offset: number) => {
     setLoading(true);
     const slugs = ['biarritz', 'anglet', 'bidart', 'guethary', 'saint-jean-de-luz', 'hendaye'];
     const newTides: Record<string, TideData> = {};
 
     try {
-      const biarritzData = await fetchTideData('biarritz');
+      const biarritzData = await fetchTideData('biarritz', offset);
       newTides['biarritz'] = biarritzData;
       setTidesByTown({ ...newTides });
 
       const others = slugs.filter(s => s !== 'biarritz');
-      const results = await Promise.allSettled(others.map(slug => fetchTideData(slug)));
+      const results = await Promise.allSettled(others.map(slug => fetchTideData(slug, offset)));
       
       results.forEach((res, index) => {
         const slug = others[index];
@@ -65,10 +69,8 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
-    loadAllTides();
-    const interval = setInterval(() => loadAllTides(), 10 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
+    loadAllTides(selectedDayOffset);
+  }, [selectedDayOffset]);
 
   const handleToggleFavorite = (spotId: string) => {
     setFavorites((prev) => {
@@ -140,14 +142,15 @@ export const App: React.FC = () => {
       {/* Main Content avec padding-bottom pour la barre flottante inférieure */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 pt-3 pb-32 sm:pb-36 space-y-3">
 
+        {/* Sélecteur de date hebdomadaire Apple Style (7 jours) */}
+        <DateSelector
+          selectedOffset={selectedDayOffset}
+          onSelectOffset={setSelectedDayOffset}
+        />
+
         {/* Dynamic View: Map or List */}
         {viewMode === 'map' ? (
           <section className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-white/50 px-1 font-medium">
-              <span>Carte des spots ({filteredSpots.length})</span>
-              <span className="text-white/40 font-mono">Anglet • Hendaye</span>
-            </div>
-
             <SpotMap
               spots={filteredSpots}
               selectedSpot={selectedSpot}
@@ -158,17 +161,6 @@ export const App: React.FC = () => {
           </section>
         ) : (
           <section className="space-y-2.5">
-            <div className="flex items-center justify-between text-xs text-white/50 px-1 font-medium">
-              <span>
-                {filteredSpots.length} {filteredSpots.length > 1 ? 'spots classés par conditions' : 'spot'}
-                {selectedTown !== 'ALL' && ` à ${selectedTown}`}
-                {showFavoritesOnly && ' (favoris)'}
-              </span>
-              <span className="text-white/40 font-mono">
-                Marées IFREMER / SHOM
-              </span>
-            </div>
-
             {loading && Object.keys(tidesByTown).length === 0 ? (
               <div className="py-20 text-center space-y-2.5">
                 <div className="w-6 h-6 border-2 border-[#007AFF] border-t-transparent rounded-full animate-spin mx-auto"></div>
