@@ -134,14 +134,10 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-nautical-900 flex flex-col text-slate-100">
       
-      {/* Sticky Header */}
-      <Header tideData={activeHeaderTide} />
-
-      {/* Main Content */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 py-3 sm:py-5 space-y-3 sm:space-y-4">
-        
-        {/* Search, View Mode & Town Filters */}
-        <section className="bg-nautical-850/80 border border-nautical-750 rounded-2xl p-3 sm:p-4">
+      {/* Barre supérieure compacte intégrée (Header + Recherche + Filtres) */}
+      <header className="sticky top-0 z-40 bg-nautical-900/95 backdrop-blur-md border-b border-nautical-750 shadow-sm">
+        <Header tideData={activeHeaderTide} />
+        <div className="max-w-5xl mx-auto px-3.5 sm:px-6 pb-2 pt-0.5">
           <SearchBar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
@@ -153,7 +149,11 @@ export const App: React.FC = () => {
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />
-        </section>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 py-2.5 sm:py-3.5 space-y-2.5 sm:space-y-3">
 
         {/* Dynamic View: Map or List */}
         {viewMode === 'map' ? (
@@ -172,7 +172,7 @@ export const App: React.FC = () => {
             />
           </section>
         ) : (
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
               <span>
                 {filteredSpots.length} {filteredSpots.length > 1 ? 'spots classés par note' : 'spot'}
@@ -200,7 +200,7 @@ export const App: React.FC = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                 {filteredSpots.map(({ spot, score, tide, isFavorite }, index) => (
                   <SpotCard
                     key={spot.id}
