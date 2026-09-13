@@ -45,17 +45,17 @@ export const DateSelector: React.FC<DateSelectorProps> = ({
             <button
               key={item.offset}
               onClick={() => onSelectOffset(item.offset)}
-              className={`flex flex-col items-center justify-center min-w-[3.6rem] sm:min-w-[4rem] py-2 px-2 rounded-2xl transition-all duration-200 active:scale-95 shrink-0 border ${
+              className={`flex flex-col items-center justify-center min-w-[3.8rem] sm:min-w-[4.2rem] py-2.5 px-2 rounded-2xl transition-all duration-300 active:scale-95 shrink-0 ${
                 isSelected
-                  ? 'bg-white text-black font-bold shadow-md border-white'
-                  : 'bg-white/[0.06] hover:bg-white/[0.1] text-white/70 border-white/[0.08]'
+                  ? 'bg-gradient-to-b from-white to-white/90 text-black font-bold shadow-[0_4px_20px_rgba(255,255,255,0.3)] border border-white'
+                  : 'liquid-glass-pill hover:bg-white/[0.12] text-white/70 hover:text-white'
               }`}
               title={item.fullDateStr}
             >
               <span className={`text-[10px] uppercase font-semibold tracking-wider ${isSelected ? 'text-black/60' : 'text-white/40'}`}>
                 {item.dayLabel}
               </span>
-              <span className="text-base sm:text-lg font-bold font-mono leading-none my-0.5">
+              <span className="text-base sm:text-lg font-bold font-mono leading-none my-1">
                 {item.dayNumber}
               </span>
               <span className={`text-[9px] font-medium lowercase ${isSelected ? 'text-black/60' : 'text-white/40'}`}>

@@ -23,30 +23,30 @@ export const SpotCard: React.FC<SpotCardProps> = ({
   const getBadgeStyle = () => {
     if (score.matchQuality === 'dangerous') {
       return {
-        bg: 'bg-[#FF3B30]/15 border-[#FF3B30]/30 text-[#FF453A]',
-        dot: 'bg-[#FF453A]',
+        bg: 'bg-[#FF3B30]/20 border-[#FF3B30]/40 text-[#FF453A] shadow-[0_0_12px_rgba(255,59,48,0.3)]',
+        dot: 'bg-[#FF453A] shadow-[0_0_6px_rgba(255,69,58,0.8)]',
       };
     }
     if (score.score >= 8.0) {
       return {
-        bg: 'bg-[#34C759]/15 border-[#34C759]/30 text-[#30D158]',
-        dot: 'bg-[#30D158]',
+        bg: 'bg-[#34C759]/20 border-[#34C759]/40 text-[#30D158] shadow-[0_0_14px_rgba(52,199,89,0.3)]',
+        dot: 'bg-[#30D158] shadow-[0_0_6px_rgba(48,209,88,0.8)]',
       };
     }
     if (score.score >= 6.0) {
       return {
-        bg: 'bg-[#007AFF]/15 border-[#007AFF]/30 text-[#0A84FF]',
-        dot: 'bg-[#0A84FF]',
+        bg: 'bg-[#007AFF]/20 border-[#007AFF]/40 text-[#0A84FF] shadow-[0_0_12px_rgba(0,122,255,0.25)]',
+        dot: 'bg-[#0A84FF] shadow-[0_0_6px_rgba(10,132,255,0.8)]',
       };
     }
     if (score.score >= 4.0) {
       return {
-        bg: 'bg-[#FF9500]/15 border-[#FF9500]/30 text-[#FF9F0A]',
-        dot: 'bg-[#FF9F0A]',
+        bg: 'bg-[#FF9500]/20 border-[#FF9500]/40 text-[#FF9F0A] shadow-[0_0_12px_rgba(255,149,0,0.25)]',
+        dot: 'bg-[#FF9F0A] shadow-[0_0_6px_rgba(255,159,10,0.8)]',
       };
     }
     return {
-      bg: 'bg-white/[0.08] border-white/[0.08] text-white/60',
+      bg: 'bg-white/[0.08] border-white/[0.12] text-white/70',
       dot: 'bg-white/40',
     };
   };
@@ -56,19 +56,19 @@ export const SpotCard: React.FC<SpotCardProps> = ({
   return (
     <div
       onClick={() => onSelectSpot(spot)}
-      className="group relative bg-white/[0.06] hover:bg-white/[0.09] active:bg-white/[0.12] border border-white/[0.08] active:border-white/[0.2] rounded-3xl p-4 sm:p-4.5 transition-all duration-200 cursor-pointer active:scale-[0.985] flex flex-col justify-between shadow-sm overflow-hidden"
+      className="group relative liquid-glass-card rounded-[1.75rem] p-4 sm:p-5 transition-all duration-300 cursor-pointer active:scale-[0.985] flex flex-col justify-between overflow-hidden"
     >
       <div>
         {/* Top bar: City & Type + Favorite */}
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="flex items-center space-x-2 text-xs text-white/50 font-medium tracking-normal truncate">
+        <div className="flex items-center justify-between gap-2 mb-2.5">
+          <div className="flex items-center space-x-2 text-xs text-white/60 font-medium tracking-normal truncate">
             {isTop && (
-              <span className="flex items-center gap-1 text-[#30D158] bg-[#34C759]/15 border border-[#34C759]/30 px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0">
+              <span className="flex items-center gap-1 text-[#30D158] bg-[#34C759]/20 border border-[#34C759]/40 px-2.5 py-0.5 rounded-full text-[10px] font-bold shrink-0 shadow-[0_0_10px_rgba(52,199,89,0.3)]">
                 <Flame className="w-3 h-3 stroke-[2.5]" />
                 <span>Top</span>
               </span>
             )}
-            <span className="text-[#0A84FF] font-semibold">{spot.town}</span>
+            <span className="text-[#38bdf8] font-semibold">{spot.town}</span>
             <span className="text-white/20">•</span>
             <span className="truncate">{spot.type === 'beach_break' ? 'Beach break' : spot.type === 'reef_break' ? 'Reef break' : 'Point break'}</span>
           </div>
@@ -79,7 +79,7 @@ export const SpotCard: React.FC<SpotCardProps> = ({
               e.stopPropagation();
               onToggleFavorite(spot.id);
             }}
-            className="w-8 h-8 -mr-1.5 -mt-1 flex items-center justify-center rounded-full text-white/40 hover:text-[#FF9500] active:scale-90 transition"
+            className="w-8 h-8 -mr-1.5 -mt-1 flex items-center justify-center rounded-full bg-white/[0.04] hover:bg-white/[0.12] border border-white/[0.06] text-white/40 hover:text-[#FF9500] active:scale-90 transition"
             aria-label={isFavorite ? 'Retirer favori' : 'Ajouter favori'}
           >
             <Star className={`w-4 h-4 stroke-[2] ${isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />

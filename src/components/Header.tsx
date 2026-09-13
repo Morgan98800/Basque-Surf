@@ -10,23 +10,23 @@ export const Header: React.FC<HeaderProps> = ({ tideData }) => {
   const isRising = tideData?.currentPhase === 'incoming' || tideData?.currentPhase === 'high';
 
   return (
-    <header className="sticky top-0 z-30 bg-black/70 backdrop-blur-2xl border-b border-white/[0.08] transition-all">
+    <header className="sticky top-0 z-30 bg-black/40 backdrop-blur-2xl border-b border-white/[0.1] shadow-[0_4px_24px_rgba(0,0,0,0.5)] transition-all">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-12 gap-3">
           
           {/* iOS Style Title */}
           <div className="flex items-center space-x-2 shrink-0">
-            <span className="w-2 h-2 rounded-full bg-[#dc2626] shadow-[0_0_8px_rgba(220,38,38,0.7)]"></span>
+            <span className="w-2 h-2 rounded-full bg-[#dc2626] shadow-[0_0_10px_rgba(220,38,38,0.8)]"></span>
             <span className="font-bold tracking-tight text-white text-base sm:text-lg">
               Basque Surf
             </span>
           </div>
 
-          {/* Dynamic Island Style Tide Pill */}
+          {/* Dynamic Island Style Tide Pill avec Liquid Glass */}
           {tideData && (
             <div className="flex items-center space-x-2 text-xs">
-              <div className="flex items-center bg-white/[0.09] hover:bg-white/[0.13] border border-white/[0.1] rounded-full px-3 py-1 text-white shadow-sm transition">
-                <div className="flex items-center space-x-1 font-semibold text-xs">
+              <div className="flex items-center liquid-glass-pill rounded-full px-3.5 py-1 text-white shadow-sm transition hover:bg-white/[0.12]">
+                <div className="flex items-center space-x-1.5 font-semibold text-xs">
                   <span>{tideData.currentHeight}m</span>
                   {isRising ? (
                     <ArrowUp className="w-3.5 h-3.5 text-[#30B0C7] stroke-[2.5]" />

@@ -11,10 +11,59 @@
   }
 
   html, body {
-    @apply bg-black text-white min-h-screen font-sans;
+    @apply bg-[#03070d] text-white min-h-screen font-sans;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
+}
+
+/* Apple Liquid Glass Engine */
+.liquid-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.liquid-glass-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 100%);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 12px 36px -4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.liquid-glass-card:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 16px 44px -4px rgba(0, 0, 0, 0.6),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.35);
+}
+
+.liquid-glass-nav {
+  background: linear-gradient(180deg, rgba(12, 16, 24, 0.8) 0%, rgba(4, 7, 12, 0.9) 100%);
+  backdrop-filter: blur(32px) saturate(210%);
+  -webkit-backdrop-filter: blur(32px) saturate(210%);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 
+    0 -12px 40px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.liquid-glass-pill {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
 /* Touch & Mobile UX */

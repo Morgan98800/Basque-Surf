@@ -134,9 +134,14 @@ export const App: React.FC = () => {
   }, [selectedSpot, tidesByTown]);
 
   return (
-    <div className="min-h-screen bg-black flex flex-col text-white selection:bg-[#007AFF] selection:text-white font-sans antialiased">
+    <div className="min-h-screen bg-[#03070d] relative flex flex-col text-white selection:bg-[#007AFF] selection:text-white font-sans antialiased overflow-x-hidden">
       
-      {/* Barre supérieure iOS */}
+      {/* Orbes de lumière ambiante liquide (Liquid Ambient Glow) */}
+      <div className="fixed top-[-10%] left-[15%] w-[450px] h-[450px] rounded-full bg-gradient-to-br from-teal-500/15 via-sky-600/10 to-transparent blur-[120px] pointer-events-none -z-10" />
+      <div className="fixed top-[40%] right-[-10%] w-[500px] h-[500px] rounded-full bg-gradient-to-tl from-blue-600/15 via-indigo-500/10 to-transparent blur-[140px] pointer-events-none -z-10" />
+      <div className="fixed bottom-[-5%] left-[-5%] w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-cyan-500/10 via-emerald-500/5 to-transparent blur-[120px] pointer-events-none -z-10" />
+
+      {/* Barre supérieure iOS Liquid Glass */}
       <Header tideData={activeHeaderTide} />
 
       {/* Main Content avec padding-bottom pour la barre flottante inférieure */}
@@ -197,8 +202,8 @@ export const App: React.FC = () => {
 
       </main>
 
-      {/* Barre d'action inférieure flottante style iOS Dock (Verre Dépoli Apple) */}
-      <nav className="fixed bottom-0 inset-x-0 z-40 bg-black/75 backdrop-blur-2xl border-t border-white/[0.1] pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
+      {/* Barre d'action inférieure flottante style iOS Liquid Glass Dock */}
+      <nav className="fixed bottom-0 inset-x-0 z-40 liquid-glass-nav pb-[max(0.7rem,env(safe-area-inset-bottom))] pt-2.5">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <SearchBar
             searchTerm={searchTerm}

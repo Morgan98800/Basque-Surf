@@ -52,14 +52,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="w-full relative" ref={menuRef}>
       
-      {/* Menu Déroulant style iOS Popover (s'ouvre vers le haut au-dessus de la barre) */}
+      {/* Menu Déroulant style iOS Liquid Glass Popover */}
       {isMenuOpen && (
-        <div className="absolute bottom-full mb-2 left-0 z-50 w-64 bg-[#1c1c1e] border border-white/[0.14] rounded-2xl shadow-2xl backdrop-blur-2xl overflow-hidden animate-slide-up p-1.5 divide-y divide-white/[0.06]">
-          <div className="px-3 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
-            Sélectionner une commune / zone
+        <div className="absolute bottom-full mb-3 left-0 z-50 w-72 bg-[#0d1522]/90 backdrop-blur-3xl border border-white/[0.18] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden animate-slide-up p-2 divide-y divide-white/[0.08]">
+          <div className="px-3.5 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+            Commune de surf
           </div>
 
-          <div className="space-y-0.5 pt-1">
+          <div className="space-y-1 pt-1.5">
             {townOptions.map((opt) => {
               const isSelected = selectedTown === opt.value;
               return (
@@ -69,17 +69,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     onTownChange(opt.value);
                     setIsMenuOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition active:scale-[0.98] ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition active:scale-[0.98] ${
                     isSelected
-                      ? 'bg-white/15 text-white font-bold'
+                      ? 'bg-gradient-to-r from-sky-500/20 to-blue-600/30 text-white font-bold border border-sky-400/30 shadow-sm'
                       : 'text-white/80 hover:bg-white/[0.08] hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-[#0A84FF]' : 'text-white/40'}`} />
+                  <div className="flex items-center gap-2.5">
+                    <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-[#38bdf8]' : 'text-white/40'}`} />
                     <span>{opt.label}</span>
                   </div>
-                  {isSelected && <Check className="w-4 h-4 text-[#0A84FF] stroke-[2.5]" />}
+                  {isSelected && <Check className="w-4 h-4 text-[#38bdf8] stroke-[2.5]" />}
                 </button>
               );
             })}
@@ -87,34 +87,34 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         </div>
       )}
 
-      {/* Ligne Unique Ultra-Épurée : Menu Commune + Recherche + Segmented Control + Favoris */}
+      {/* Ligne Unique : Menu Commune + Recherche + Segmented Control + Favoris */}
       <div className="flex items-center gap-2">
         
-        {/* Bouton Menu Déroulant Commune (Style Apple Menu) */}
+        {/* Bouton Menu Déroulant Commune */}
         <button
           type="button"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className={`h-10 px-3 rounded-xl border flex items-center gap-1.5 text-xs font-semibold shrink-0 transition active:scale-95 ${
+          className={`h-10 px-3.5 rounded-2xl border flex items-center gap-1.5 text-xs font-semibold shrink-0 transition active:scale-95 ${
             selectedTown !== 'ALL'
-              ? 'bg-white text-black border-white shadow-sm'
-              : 'bg-white/[0.08] hover:bg-white/[0.12] text-white border-white/[0.08]'
+              ? 'bg-gradient-to-b from-white to-white/95 text-black border-white shadow-[0_2px_12px_rgba(255,255,255,0.25)]'
+              : 'liquid-glass-pill hover:bg-white/[0.14] text-white'
           }`}
           title="Choisir une commune"
         >
-          <MapPin className={`w-3.5 h-3.5 stroke-[2] ${selectedTown !== 'ALL' ? 'text-black' : 'text-[#0A84FF]'}`} />
+          <MapPin className={`w-3.5 h-3.5 stroke-[2] ${selectedTown !== 'ALL' ? 'text-black' : 'text-[#38bdf8]'}`} />
           <span className="max-w-[85px] sm:max-w-none truncate">{currentLabel}</span>
           <ChevronDown className={`w-3.5 h-3.5 stroke-[2.5] transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        {/* Champ de recherche style iOS Spotlight (h-10) */}
+        {/* Champ de recherche style Liquid Glass */}
         <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none stroke-[2]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none stroke-[2]" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Plage (Lafitenia, Cavaliers...)"
-            className="w-full h-10 pl-9 pr-8 bg-white/[0.08] hover:bg-white/[0.11] focus:bg-white/[0.14] border border-white/[0.08] focus:border-[#007AFF] rounded-xl text-white placeholder-white/40 text-xs focus:outline-none transition shadow-inner"
+            className="w-full h-10 pl-9 pr-8 liquid-glass-pill focus:border-sky-400 focus:bg-white/[0.12] rounded-2xl text-white placeholder-white/40 text-xs focus:outline-none transition shadow-inner"
           />
           {searchTerm && (
             <button
@@ -127,13 +127,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           )}
         </div>
 
-        {/* Segmented Control iOS Natif (Gris avec pilule blanche active) */}
-        <div className="flex items-center bg-white/[0.08] border border-white/[0.06] rounded-xl p-0.5 h-10 shrink-0">
+        {/* Segmented Control iOS Liquid Glass */}
+        <div className="flex items-center liquid-glass-pill rounded-2xl p-1 h-10 shrink-0">
           <button
             onClick={() => onViewModeChange('list')}
-            className={`h-8 px-2.5 sm:px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ${
+            className={`h-8 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all duration-300 ${
               viewMode === 'list'
-                ? 'bg-white/20 text-white shadow-sm font-bold'
+                ? 'bg-gradient-to-b from-white/30 to-white/10 text-white shadow-md border border-white/20 font-bold'
                 : 'text-white/60 hover:text-white'
             }`}
             title="Vue liste"
@@ -144,9 +144,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
           <button
             onClick={() => onViewModeChange('map')}
-            className={`h-8 px-2.5 sm:px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ${
+            className={`h-8 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all duration-300 ${
               viewMode === 'map'
-                ? 'bg-white/20 text-white shadow-sm font-bold'
+                ? 'bg-gradient-to-b from-white/30 to-white/10 text-white shadow-md border border-white/20 font-bold'
                 : 'text-white/60 hover:text-white'
             }`}
             title="Vue carte"
@@ -156,20 +156,20 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </button>
         </div>
 
-        {/* Bouton Favoris style iOS */}
+        {/* Bouton Favoris Liquid Glass */}
         <button
           onClick={onToggleFavoritesOnly}
-          className={`h-10 px-3 rounded-xl text-xs font-medium flex items-center gap-1.5 shrink-0 border transition active:scale-95 ${
+          className={`h-10 px-3.5 rounded-2xl text-xs font-medium flex items-center gap-1.5 shrink-0 transition active:scale-95 ${
             showFavoritesOnly
-              ? 'bg-[#FF9500]/20 text-[#FF9500] border-[#FF9500]/40 shadow-sm'
-              : 'bg-white/[0.08] text-white/60 border-white/[0.08] hover:text-white hover:bg-white/[0.12]'
+              ? 'bg-[#FF9500]/25 text-[#FF9F0A] border border-[#FF9500]/50 shadow-[0_0_12px_rgba(255,149,0,0.35)]'
+              : 'liquid-glass-pill text-white/60 hover:text-white hover:bg-white/[0.14]'
           }`}
           title="Afficher les favoris"
         >
           <Star className={`w-4 h-4 stroke-[2] ${showFavoritesOnly ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
           {favoritesCount > 0 && (
             <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
-              showFavoritesOnly ? 'bg-[#FF9500]/30 text-[#FF9500]' : 'bg-white/10 text-white/70'
+              showFavoritesOnly ? 'bg-[#FF9500]/40 text-white' : 'bg-white/10 text-white/70'
             }`}>
               {favoritesCount}
             </span>
