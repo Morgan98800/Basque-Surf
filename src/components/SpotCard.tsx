@@ -92,13 +92,12 @@ export const SpotCard: React.FC<SpotCardProps> = ({
             {spot.name}
           </h3>
 
-          {/* Note sur 10 style Widget Apple */}
+          {/* Note sur 10 style Widget Apple épuré */}
           <div className={`shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full border ${badge.bg}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`}></span>
             <span className="text-base sm:text-lg font-bold font-mono">
               {score.scoreFormatted}
             </span>
-            <span className="text-[10px] text-white/40 font-medium">/10</span>
           </div>
         </div>
 

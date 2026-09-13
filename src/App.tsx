@@ -214,22 +214,6 @@ export const App: React.FC = () => {
         </div>
       </nav>
 
-      {/* Clean Apple Style Footer */}
-      <footer className="border-t border-white/[0.08] bg-black py-4 text-xs text-white/40 mb-24 sm:mb-20">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-          <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-[#dc2626] shadow-[0_0_6px_rgba(220,38,38,0.7)]"></span>
-            <span className="font-semibold text-white/90">BASQUE SURF</span>
-            <span className="text-white/20">•</span>
-            <span className="text-white/50">Anglet à Hendaye</span>
-          </div>
-
-          <div className="text-white/40">
-            Données marées officielles CoefMarée (IFREMER / SHOM)
-          </div>
-        </div>
-      </footer>
-
       {/* Spot Detail Mobile Bottom Sheet / Modal */}
       {selectedSpot && selectedSpotTide && (
         <SpotDetailModal

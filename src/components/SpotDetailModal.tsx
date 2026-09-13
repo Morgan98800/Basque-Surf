@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, Navigation, ShieldCheck } from 'lucide-react';
+import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, Navigation } from 'lucide-react';
 
 interface SpotDetailModalProps {
   spot: Spot | null;
@@ -221,22 +221,13 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
             {spot.description}
           </p>
 
-          <div className="flex items-center gap-1.5 text-[10px] text-white/40 pt-1 px-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#30D158] shrink-0 stroke-[2]" />
-            <span>{tide.attribution || 'Données IFREMER/PREVIMER calibrées SHOM'}</span>
-          </div>
-
         </div>
 
-        {/* Bottom Action: Bouton Apple Style */}
-        <div className="p-4 border-t border-white/[0.08] bg-[#161618] flex items-center justify-between gap-3">
-          <span className="text-xs text-white/50 font-medium">
-            {spot.town}
-          </span>
-
+        {/* Bottom Action: Bouton Apple Style Pleine Largeur */}
+        <div className="p-4 border-t border-white/[0.08] bg-[#161618]">
           <button
             onClick={openGPS}
-            className="h-11 px-6 rounded-full bg-[#007AFF] hover:bg-[#0062cc] active:scale-95 text-white font-semibold text-xs flex items-center justify-center gap-2 transition shadow-md"
+            className="w-full h-11 px-6 rounded-full bg-[#007AFF] hover:bg-[#0062cc] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition shadow-md"
           >
             <Navigation className="w-4 h-4 fill-white stroke-white" />
             <span>Itinéraire Apple Plans</span>

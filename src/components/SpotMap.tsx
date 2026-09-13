@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { Navigation, Star, Clock, ChevronRight, Compass } from 'lucide-react';
+import { Navigation, Star, Clock, ChevronRight } from 'lucide-react';
 
 interface SpotMapProps {
   spots: Array<{ spot: Spot; score: SpotScore; tide: TideData; isFavorite: boolean }>;
@@ -156,14 +156,6 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       
       {/* Conteneur Leaflet */}
       <div ref={mapContainerRef} className="flex-1 w-full h-full z-10" />
-
-      {/* Badge Côte Basque style Apple Maps */}
-      <div className="absolute top-3 left-3 z-20 pointer-events-none bg-black/70 backdrop-blur-xl border border-white/[0.12] px-3.5 py-1.5 rounded-full shadow-lg flex items-center gap-2">
-        <Compass className="w-4 h-4 text-[#0A84FF] shrink-0 stroke-[2.2]" />
-        <span className="text-xs font-semibold text-white tracking-normal">
-          Spots Côte Basque (Anglet • Hendaye)
-        </span>
-      </div>
 
       {/* Fiche d'action flottante sous la carte façon Apple Maps Card */}
       {activeSpotData && (
