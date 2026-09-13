@@ -10,12 +10,41 @@
     -webkit-tap-highlight-color: transparent;
 
     /* Apple Spring & iOS Sheet Curves */
-    --spring: linear(
-      0, 0.009, 0.035, 0.078, 0.137, 0.212, 0.301, 0.404, 0.519, 0.646,
-      0.781, 0.924, 1.019, 1.072, 1.09, 1.08, 1.052, 1.017, 0.995, 0.986, 0.988,
-      0.995, 1.001, 1.003, 1
-    );
+    --spring: cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    --spring-sheet: cubic-bezier(0.32, 0.72, 0, 1);
     --ease-io: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* Animations natives iOS 18 avec acceleration GPU */
+  @keyframes iosSlideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(28px) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes iosFadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: iosSlideUp 0.36s var(--spring-sheet) both;
+    will-change: transform, opacity;
+  }
+
+  .animate-fade-in {
+    animation: iosFadeIn 0.3s var(--ease-io) both;
   }
 
   html, body {
@@ -160,13 +189,21 @@ button, a {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Scroll snap & Hide Scrollbar */
+/* Scroll snap & Hide Scrollbar with iOS Momentum */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+/* Fluid Native Momentum Scrolling for Bottom Sheets */
+.overscroll-contain {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Leaflet Dark Matter Tweaks */

@@ -53,7 +53,7 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   const activeHourIndex = scrubIndex !== null ? scrubIndex : (isToday ? Math.min(23, currentHour) : 12);
   const activeHourlyPoint = tide.hourlyCurve[activeHourIndex] || tide.hourlyCurve[0];
 
-  // Gestion du glissement vers le bas (Swipe-to-dismiss)
+  // Gestion du glissement vers le bas (Swipe-to-dismiss haute fidélité)
   const handleDragStart = (clientY: number) => {
     dragStartY.current = clientY;
     currentDragY.current = 0;
@@ -62,20 +62,23 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
 
   const handleDragMove = (clientY: number) => {
     if (!isDragging) return;
-    const deltaY = clientY - dragStartY.current;
-    if (deltaY > 0) {
-      currentDragY.current = deltaY;
-      setDragY(deltaY);
+    const rawDelta = clientY - dragStartY.current;
+    if (rawDelta > 0) {
+      currentDragY.current = rawDelta;
+      setDragY(rawDelta);
     } else {
-      currentDragY.current = 0;
-      setDragY(0);
+      // Effet de résistance élastique Apple (rubber-banding) si on tire vers le haut
+      const resistanceDelta = rawDelta * 0.25;
+      currentDragY.current = resistanceDelta;
+      setDragY(resistanceDelta);
     }
   };
 
   const handleDragEnd = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    if (currentDragY.current > 75) {
+    // Seuil de fermeture réactif (60px suffisent pour un geste fluide)
+    if (currentDragY.current > 60) {
       onClose();
     } else {
       setDragY(0);
@@ -101,7 +104,7 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   };
 
   const handleContentTouchEnd = () => {
-    if (currentDragY.current > 75) {
+    if (currentDragY.current > 60) {
       onClose();
     } else {
       setDragY(0);
@@ -109,32 +112,35 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
     currentDragY.current = 0;
   };
 
+  // Calcul du fade de l'arrière-plan pendant le drag
+  const backdropOpacity = dragY > 0 ? Math.max(0.2, 1 - dragY / 350) : 1;
+
   return (
     <div 
       className="fixed inset-0 z-50 flex sm:items-center items-end justify-center bg-black/70 backdrop-blur-md p-0 sm:p-4 transition-opacity duration-200"
+      style={{ opacity: backdropOpacity }}
       onClick={onClose}
     >
       <div 
-        className="w-full sm:max-w-lg bg-[#1c1c1e] border-t sm:border border-white/[0.12] rounded-t-[2.5rem] sm:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col animate-slide-up overflow-hidden transition-transform duration-200"
+        className="w-full sm:max-w-lg bg-[#1c1c1e] border-t sm:border border-white/[0.12] rounded-t-[2.5rem] sm:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col animate-slide-up overflow-hidden will-change-transform"
         style={{
-          transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
-          transition: isDragging ? 'none' : 'transform 0.25s cubic-bezier(0.32, 0.72, 0, 1)'
+          transform: dragY !== 0 ? `translate3d(0, ${dragY}px, 0)` : undefined,
+          transition: isDragging ? 'none' : 'transform 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.1)'
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* iOS Drag Indicator / Poignée de glissement tactile vers le bas */}
         <div 
-          className="pt-4 pb-2.5 cursor-grab active:cursor-grabbing flex items-center justify-center select-none w-full touch-none"
+          className="pt-3.5 pb-2.5 cursor-grab active:cursor-grabbing flex items-center justify-center select-none w-full touch-none"
           onTouchStart={(e) => handleDragStart(e.touches[0].clientY)}
           onTouchMove={(e) => handleDragMove(e.touches[0].clientY)}
           onTouchEnd={handleDragEnd}
           onMouseDown={(e) => handleDragStart(e.clientY)}
           onMouseMove={(e) => handleDragMove(e.clientY)}
           onMouseUp={handleDragEnd}
-          onClick={onClose}
           title="Faire glisser vers le bas pour fermer"
         >
-          <div className="w-12 h-1.5 rounded-full bg-white/35 hover:bg-white/60 transition-colors" />
+          <div className="w-12 h-1.5 rounded-full bg-white/35 active:scale-95 transition-transform" />
         </div>
 
         {/* Header Bar avec Croix Apple agrandie et repositionnée */}

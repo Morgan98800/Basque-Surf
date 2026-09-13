@@ -35,7 +35,7 @@ export const DateSelector: React.FC<DateSelectorProps> = ({
 
   return (
     <div className="w-full min-w-0 max-w-full overflow-hidden relative">
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar -mx-3.5 px-3.5 sm:mx-0 sm:px-0 snap-x snap-mandatory scroll-smooth w-full min-w-0">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar -mx-3.5 px-3.5 sm:mx-0 sm:px-0 snap-x snap-proximity overscroll-x-contain touch-pan-x w-full min-w-0">
         {days.map((item) => {
           const isSelected = selectedOffset === item.offset;
 
