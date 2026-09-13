@@ -15,6 +15,15 @@ export interface Spot {
   coefMareeSlug: string; // 'anglet' | 'biarritz' | 'bidart' | 'guethary' | 'saint-jean-de-luz' | 'hendaye'
   type: SpotType;
   level: SurfLevel;
+
+  // — Exposition houle v2 (Variable #1) —
+  exposure?: number;                                // 0 = très abrité, 1 = plein large
+  swellWindow?: { dirMin: number; dirMax: number }; // Degrés
+  sizeRange?: { min: number; max: number };         // Hauteur utile au déferlement (mètres)
+  optimalSize?: number;                             // Hauteur idéale (mètres)
+  offshoreDir?: number;                             // Cap offshore en degrés
+  baineRisk?: number;                               // 0 à 1
+
   optimalTideRange: {
     minHeight: number; // en mètres
     maxHeight: number; // en mètres
@@ -76,5 +85,17 @@ export interface SpotScore {
   hazardLevel: HazardLevel;
   hazardChip: string;
   bestWindowToday?: string;
+
+  // Champs enrichis moteur v2
+  confidence?: number;
+  breakdown?: {
+    fSwell: number;
+    fPeriod: number;
+    fWind: number;
+    fTide: number;
+    fWindow: number;
+    rawEnergy: number;
+    effectiveSwellHeight: number;
+  };
 }
 
