@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, ExternalLink } from 'lucide-react';
+import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, Navigation, ShieldCheck } from 'lucide-react';
 
 interface SpotDetailModalProps {
   spot: Spot | null;
@@ -30,6 +30,19 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   if (!spot || !score || !tide) return null;
 
   const currentHour = new Date().getHours();
+
+  // Liens d'itinéraires GPS
+  const openGoogleMaps = () => {
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lon}`, '_blank');
+  };
+
+  const openAppleMaps = () => {
+    window.open(`maps://maps.apple.com/?daddr=${spot.lat},${spot.lon}&q=${encodeURIComponent(spot.name)}&dirflg=d`, '_blank');
+  };
+
+  const openWaze = () => {
+    window.open(`https://waze.com/ul?ll=${spot.lat},${spot.lon}&navigate=yes`, '_blank');
+  };
 
   return (
     <div 
@@ -203,23 +216,44 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
             {spot.description}
           </p>
 
+          <div className="flex items-center gap-1.5 text-[10px] text-slate-500 pt-1">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <span>{tide.attribution || 'Données IFREMER/PREVIMER calibrées SHOM'}</span>
+          </div>
+
         </div>
 
-        {/* Bottom Action Footer */}
-        <div className="p-3 border-t border-nautical-750 bg-nautical-950 flex items-center justify-between gap-3">
-          <span className="text-[10px] text-slate-500 font-mono">
-            {spot.lat.toFixed(3)}, {spot.lon.toFixed(3)}
-          </span>
+        {/* Bottom Action: GPS Navigation */}
+        <div className="p-3 border-t border-nautical-750 bg-nautical-950 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          <div className="text-[11px] text-slate-400 font-mono text-center sm:text-left">
+            GPS : {spot.lat.toFixed(4)}, {spot.lon.toFixed(4)}
+          </div>
 
-          <a
-            href={`https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lon}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="h-10 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-semibold text-xs flex items-center gap-1.5 transition"
-          >
-            <span>Itinéraire GPS</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={openGoogleMaps}
+              className="flex-1 sm:flex-initial h-10 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-md"
+            >
+              <Navigation className="w-3.5 h-3.5 fill-white" />
+              <span>Google Maps</span>
+            </button>
+
+            <button
+              onClick={openAppleMaps}
+              className="h-10 px-3.5 rounded-xl bg-nautical-800 hover:bg-nautical-750 border border-nautical-700 active:scale-95 text-slate-200 font-semibold text-xs transition"
+              title="Ouvrir dans Apple Plans"
+            >
+              Plans (Apple)
+            </button>
+
+            <button
+              onClick={openWaze}
+              className="h-10 px-3 rounded-xl bg-nautical-800 hover:bg-nautical-750 border border-nautical-700 active:scale-95 text-slate-300 font-semibold text-xs transition"
+              title="Ouvrir dans Waze"
+            >
+              Waze
+            </button>
+          </div>
         </div>
 
       </div>

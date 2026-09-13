@@ -6,6 +6,7 @@ import { evaluateSpotConditions } from './services/scoring';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
 import { SpotCard } from './components/SpotCard';
+import { SpotMap } from './components/SpotMap';
 import { SpotDetailModal } from './components/SpotDetailModal';
 import { ApiSettingsModal } from './components/ApiSettingsModal';
 import { AlertCircle, ArrowUpRight } from 'lucide-react';
@@ -18,13 +19,16 @@ export const App: React.FC = () => {
   const [apiSettings, setApiSettings] = useState<ApiSettings>(getSavedApiSettings());
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
+  // Vue : Liste ou Carte
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+
   // Recherche & Filtres
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedTown, setSelectedTown] = useState<BasqueTown | 'ALL'>('ALL');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<'score' | 'name' | 'town'>('score');
 
-  // Spot sélectionné pour Bottom Sheet
+  // Spot sélectionné pour Bottom Sheet ou Carte
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
 
   // Favoris persistants
@@ -153,9 +157,9 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 py-3.5 sm:py-6 space-y-3.5 sm:space-y-4">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 py-3 sm:py-5 space-y-3 sm:space-y-4">
         
-        {/* Compact Quick Highlight Strip (No AI fluff) */}
+        {/* Quick Highlight Strip */}
         {topSpot && activeHeaderTide && (
           <div 
             onClick={() => setSelectedSpot(topSpot.spot)}
@@ -175,7 +179,7 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* Search & Town Filters */}
+        {/* Search, View Mode & Town Filters */}
         <section className="bg-nautical-850/80 border border-nautical-750 rounded-2xl p-3 sm:p-4">
           <SearchBar
             searchTerm={searchTerm}
@@ -187,53 +191,72 @@ export const App: React.FC = () => {
             favoritesCount={favorites.length}
             sortBy={sortBy}
             onSortChange={setSortBy}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
         </section>
 
-        {/* Spots Grid */}
-        <section className="space-y-2.5">
-          <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
-            <span>
-              {filteredSpots.length} {filteredSpots.length > 1 ? 'spots' : 'spot'}
-              {selectedTown !== 'ALL' && ` à ${selectedTown}`}
-              {showFavoritesOnly && ' (favoris)'}
-            </span>
-            <span className="text-slate-500 font-mono">
-              Atlas IFREMER/SHOM
-            </span>
-          </div>
+        {/* Dynamic View: Map or List */}
+        {viewMode === 'map' ? (
+          <section className="space-y-2">
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Carte interactive de la Côte Basque ({filteredSpots.length} spots)</span>
+              <span className="text-slate-500">Cliquez sur un marqueur pour naviguer</span>
+            </div>
 
-          {loading && Object.keys(tidesByTown).length === 0 ? (
-            <div className="py-16 text-center space-y-2">
-              <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="text-xs text-slate-400">Chargement des marées...</p>
+            <SpotMap
+              spots={filteredSpots}
+              selectedSpot={selectedSpot}
+              onSelectSpot={(sp) => setSelectedSpot(sp)}
+              onOpenDetails={(sp) => setSelectedSpot(sp)}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          </section>
+        ) : (
+          <section className="space-y-2.5">
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>
+                {filteredSpots.length} {filteredSpots.length > 1 ? 'spots' : 'spot'}
+                {selectedTown !== 'ALL' && ` à ${selectedTown}`}
+                {showFavoritesOnly && ' (favoris)'}
+              </span>
+              <span className="text-slate-500 font-mono">
+                Atlas IFREMER/SHOM
+              </span>
             </div>
-          ) : filteredSpots.length === 0 ? (
-            <div className="py-12 text-center bg-nautical-850 border border-nautical-750 rounded-xl p-6 space-y-2">
-              <AlertCircle className="w-8 h-8 text-slate-500 mx-auto" />
-              <h3 className="text-sm font-semibold text-slate-200">Aucun spot trouvé</h3>
-              <p className="text-xs text-slate-400 max-w-xs mx-auto">
-                {showFavoritesOnly 
-                  ? "Ajoutez des spots en favoris en cliquant sur l'étoile pour les retrouver ici."
-                  : "Essayez un autre mot clé ou sélectionnez une autre commune."}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5">
-              {filteredSpots.map(({ spot, score, tide, isFavorite }) => (
-                <SpotCard
-                  key={spot.id}
-                  spot={spot}
-                  score={score}
-                  tide={tide}
-                  isFavorite={isFavorite}
-                  onToggleFavorite={handleToggleFavorite}
-                  onSelectSpot={(sp) => setSelectedSpot(sp)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+
+            {loading && Object.keys(tidesByTown).length === 0 ? (
+              <div className="py-16 text-center space-y-2">
+                <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-xs text-slate-400">Chargement des marées...</p>
+              </div>
+            ) : filteredSpots.length === 0 ? (
+              <div className="py-12 text-center bg-nautical-850 border border-nautical-750 rounded-xl p-6 space-y-2">
+                <AlertCircle className="w-8 h-8 text-slate-500 mx-auto" />
+                <h3 className="text-sm font-semibold text-slate-200">Aucun spot trouvé</h3>
+                <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                  {showFavoritesOnly 
+                    ? "Ajoutez des spots en favoris en cliquant sur l'étoile pour les retrouver ici."
+                    : "Essayez un autre mot clé ou sélectionnez une autre commune."}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5">
+                {filteredSpots.map(({ spot, score, tide, isFavorite }) => (
+                  <SpotCard
+                    key={spot.id}
+                    spot={spot}
+                    score={score}
+                    tide={tide}
+                    isFavorite={isFavorite}
+                    onToggleFavorite={handleToggleFavorite}
+                    onSelectSpot={(sp) => setSelectedSpot(sp)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
       </main>
 
