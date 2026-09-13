@@ -1,13 +1,12 @@
 import React from 'react';
 import { TideData } from '../types/index';
-import { Settings, ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowUp, ArrowDown } from 'lucide-react';
 
 interface HeaderProps {
   tideData: TideData | null;
-  onOpenSettings: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ tideData, onOpenSettings }) => {
+export const Header: React.FC<HeaderProps> = ({ tideData }) => {
   const isRising = tideData?.currentPhase === 'incoming' || tideData?.currentPhase === 'high';
 
   return (
@@ -17,12 +16,10 @@ export const Header: React.FC<HeaderProps> = ({ tideData, onOpenSettings }) => {
           
           {/* Logo & Brand */}
           <div className="flex items-center space-x-2.5 shrink-0">
-            <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-sm bg-ikurrina-red shadow-sm"></span>
-              <span className="font-extrabold tracking-tight text-white text-base sm:text-lg uppercase">
-                Basque Surf
-              </span>
-            </div>
+            <span className="w-2.5 h-2.5 rounded-sm bg-ikurrina-red shadow-sm"></span>
+            <span className="font-extrabold tracking-tight text-white text-base sm:text-lg uppercase">
+              Basque Surf
+            </span>
             <span className="hidden sm:inline-block text-[11px] font-semibold uppercase tracking-wider text-slate-400 bg-nautical-800 px-2 py-0.5 rounded border border-nautical-700">
               Côte Basque
             </span>
@@ -57,16 +54,6 @@ export const Header: React.FC<HeaderProps> = ({ tideData, onOpenSettings }) => {
                 <span>•</span>
                 <span>PM <strong>{tideData.nextHigh.time}</strong></span>
               </div>
-
-              {/* Settings button */}
-              <button
-                onClick={onOpenSettings}
-                className="p-1.5 rounded-lg bg-nautical-800 text-slate-400 hover:text-white border border-nautical-700 active:scale-95 transition"
-                title="Source marées & API"
-                aria-label="Paramètres"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
 
             </div>
           )}

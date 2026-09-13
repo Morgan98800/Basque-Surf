@@ -11,8 +11,6 @@ interface SearchBarProps {
   showFavoritesOnly: boolean;
   onToggleFavoritesOnly: () => void;
   favoritesCount: number;
-  sortBy: 'score' | 'name' | 'town';
-  onSortChange: (sort: 'score' | 'name' | 'town') => void;
   viewMode: 'list' | 'map';
   onViewModeChange: (mode: 'list' | 'map') => void;
 }
@@ -25,8 +23,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   showFavoritesOnly,
   onToggleFavoritesOnly,
   favoritesCount,
-  sortBy,
-  onSortChange,
   viewMode,
   onViewModeChange,
 }) => {
@@ -105,21 +101,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             </span>
           )}
         </button>
-
-        {/* Tri (Desktop) */}
-        {viewMode === 'list' && (
-          <div className="hidden md:flex items-center h-11 px-2.5 bg-nautical-800 border border-nautical-700 rounded-xl text-xs text-slate-300 shrink-0">
-            <select
-              value={sortBy}
-              onChange={(e) => onSortChange(e.target.value as any)}
-              className="bg-transparent text-xs text-slate-200 font-medium focus:outline-none cursor-pointer pr-1"
-            >
-              <option value="score" className="bg-nautical-850">Note max</option>
-              <option value="town" className="bg-nautical-850">Par ville</option>
-              <option value="name" className="bg-nautical-850">A-Z</option>
-            </select>
-          </div>
-        )}
 
       </div>
 

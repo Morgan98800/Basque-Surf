@@ -20,7 +20,7 @@ export interface Spot {
   };
   tideDescription: string;
   hazards?: string;
-  highTideRisk?: boolean; // ex: Côte des Basques (pas de plage à marée haute)
+  highTideRisk?: boolean;
   bestWind: string;
   bestSwell: string;
   description: string;
@@ -46,10 +46,10 @@ export interface TideHourlyPoint {
 export interface TideData {
   townSlug: string;
   townName: string;
-  currentHeight: number; // ex: 2.85
+  currentHeight: number;
   currentPhase: TidePhase;
-  phaseLabel: string; // "Mi-marée montante"
-  coefficient: number; // ex: 98
+  phaseLabel: string;
+  coefficient: number;
   nextHigh: TideExtreme;
   nextLow: TideExtreme;
   todayExtremes: TideExtreme[];
@@ -63,17 +63,11 @@ export interface TideData {
 export type TideMatchQuality = 'perfect' | 'good' | 'average' | 'poor' | 'dangerous';
 
 export interface SpotScore {
-  score: number; // ex: 8.4
-  scoreFormatted: string; // "8,4"
-  label: string; // "Excellentes conditions", "Conditions moyennes", etc.
+  score: number;
+  scoreFormatted: string;
+  label: string;
   explanation: string;
   matchQuality: TideMatchQuality;
   warning?: string;
-  bestWindowToday?: string; // "13:30 - 16:45"
-}
-
-export interface ApiSettings {
-  apiKey: string;
-  provider: 'coefmaree' | 'stormglass' | 'worldtides';
-  enabled: boolean;
+  bestWindowToday?: string;
 }

@@ -41,20 +41,17 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       minZoom: 11,
       maxZoom: 16,
       maxBounds: BASQUE_BOUNDS,
-      maxBoundsViscosity: 0.9, // Empêche de quitter la Côte Basque
+      maxBoundsViscosity: 0.9,
       zoomControl: false,
     });
 
-    // Tuiles maritimes sombres CartoDB Dark Matter
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap &copy; CARTO',
       subdomains: 'abcd',
       maxZoom: 19,
     }).addTo(map);
 
-    // Zoom control en haut à droite
     L.control.zoom({ position: 'topright' }).addTo(map);
-
     mapInstanceRef.current = map;
 
     return () => {
@@ -63,25 +60,22 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     };
   }, []);
 
-  // Mise à jour des marqueurs quand les spots ou la sélection changent
+  // Mise à jour des marqueurs
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    // Nettoyer les marqueurs précédents
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current.clear();
 
     spots.forEach(({ spot, score, isFavorite }) => {
       const isSelected = selectedSpot?.id === spot.id;
 
-      // Déterminer la couleur selon la note
-      let badgeBg = '#10b981'; // Emerald
-      if (score.matchQuality === 'dangerous') badgeBg = '#ef4444'; // Red
-      else if (score.score < 5.0) badgeBg = '#64748b'; // Slate
-      else if (score.score < 7.0) badgeBg = '#0284c7'; // Sky
+      let badgeBg = '#10b981';
+      if (score.matchQuality === 'dangerous') badgeBg = '#ef4444';
+      else if (score.score < 5.0) badgeBg = '#64748b';
+      else if (score.score < 7.0) badgeBg = '#0284c7';
 
-      // Custom HTML Marker Pin
       const html = `
         <div class="spot-marker ${isSelected ? 'marker-selected' : ''}" style="
           display: flex;
@@ -134,7 +128,6 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     });
   }, [spots, selectedSpot, onSelectSpot]);
 
-  // Si un spot est sélectionné, centrer doucement
   useEffect(() => {
     if (selectedSpot && mapInstanceRef.current) {
       mapInstanceRef.current.panTo([selectedSpot.lat, selectedSpot.lon], {
@@ -144,23 +137,15 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     }
   }, [selectedSpot]);
 
-  // Spot actif pour le bandeau d'action sous la carte
   const activeSpotData = spots.find((s) => s.spot.id === selectedSpot?.id) || spots[0];
 
-  // Fonctions d'ouverture des applications GPS Maps
-  const openAppleMaps = (lat: number, lon: number, name: string) => {
-    const url = `maps://maps.apple.com/?daddr=${lat},${lon}&q=${encodeURIComponent(name)}&dirflg=d`;
-    window.open(url, '_blank');
-  };
-
-  const openGoogleMaps = (lat: number, lon: number) => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-    window.open(url, '_blank');
-  };
-
-  const openWaze = (lat: number, lon: number) => {
-    const url = `https://waze.com/ul?ll=${lat},${lon}&navigate=yes`;
-    window.open(url, '_blank');
+  const openGPS = (lat: number, lon: number, name: string) => {
+    const isApple = /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
+    if (isApple) {
+      window.open(`maps://maps.apple.com/?daddr=${lat},${lon}&q=${encodeURIComponent(name)}&dirflg=d`, '_blank');
+    } else {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
+    }
   };
 
   return (
@@ -169,7 +154,7 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       {/* Conteneur Leaflet */}
       <div ref={mapContainerRef} className="flex-1 w-full h-full z-10" />
 
-      {/* Badge Côte Basque fixe en haut à gauche */}
+      {/* Badge Côte Basque */}
       <div className="absolute top-3 left-3 z-20 pointer-events-none bg-nautical-900/90 backdrop-blur-md border border-nautical-700 px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-2">
         <Compass className="w-4 h-4 text-sky-400 shrink-0" />
         <span className="text-xs font-bold text-white uppercase tracking-wider">
@@ -177,7 +162,7 @@ export const SpotMap: React.FC<SpotMapProps> = ({
         </span>
       </div>
 
-      {/* Fiche d'action flottante en bas de carte */}
+      {/* Fiche d'action flottante sous la carte */}
       {activeSpotData && (
         <div className="absolute bottom-3 inset-x-3 sm:inset-x-6 z-20 bg-nautical-900/95 backdrop-blur-md border border-nautical-700 rounded-xl p-3 sm:p-3.5 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-slide-up">
           
@@ -198,23 +183,23 @@ export const SpotMap: React.FC<SpotMapProps> = ({
               </div>
             </div>
 
-            {/* Note sur 10 */}
+            {/* Note mobile */}
             <div className="sm:hidden shrink-0 flex items-baseline gap-1 px-2.5 py-1 bg-nautical-800 border border-nautical-700 rounded-lg font-mono">
               <span className="text-base font-extrabold text-emerald-400">{activeSpotData.score.scoreFormatted}</span>
               <span className="text-[10px] text-slate-400 font-bold">/10</span>
             </div>
           </div>
 
-          {/* Note sur desktop */}
+          {/* Note desktop */}
           <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-nautical-800 border border-nautical-700 rounded-xl font-mono shrink-0">
             <span className="text-lg font-extrabold text-emerald-400">{activeSpotData.score.scoreFormatted}</span>
             <span className="text-xs text-slate-400 font-bold">/10</span>
           </div>
 
-          {/* Boutons d'action : Détails & Navigation GPS */}
+          {/* Boutons d'action */}
           <div className="flex items-center gap-2 shrink-0">
             
-            {/* Bouton Favori */}
+            {/* Favori */}
             <button
               onClick={() => onToggleFavorite(activeSpotData.spot.id)}
               className="h-10 w-10 flex items-center justify-center rounded-xl bg-nautical-800 border border-nautical-700 text-slate-400 hover:text-amber-400 active:scale-95 transition"
@@ -223,42 +208,23 @@ export const SpotMap: React.FC<SpotMapProps> = ({
               <Star className={`w-4 h-4 ${activeSpotData.isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} />
             </button>
 
-            {/* Bouton Voir la marée */}
+            {/* Fiche & Marée */}
             <button
               onClick={() => onOpenDetails(activeSpotData.spot)}
-              className="h-10 px-3 rounded-xl bg-nautical-800 hover:bg-nautical-750 border border-nautical-700 text-slate-200 text-xs font-semibold flex items-center gap-1 active:scale-95 transition"
+              className="h-10 px-3.5 rounded-xl bg-nautical-800 hover:bg-nautical-750 border border-nautical-700 text-slate-200 text-xs font-semibold flex items-center gap-1 active:scale-95 transition"
             >
               <span>Marée & Fiche</span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
             </button>
 
-            {/* Bouton GPS Navigation */}
-            <div className="flex items-center rounded-xl overflow-hidden bg-sky-600 hover:bg-sky-500 shadow-md transition active:scale-95">
-              <button
-                onClick={() => openGoogleMaps(activeSpotData.spot.lat, activeSpotData.spot.lon)}
-                className="h-10 px-3.5 text-white text-xs font-bold flex items-center gap-1.5"
-                title="Lancer l'itinéraire GPS (Google Maps)"
-              >
-                <Navigation className="w-3.5 h-3.5 fill-white" />
-                <span>Y aller</span>
-              </button>
-
-              <button
-                onClick={() => openAppleMaps(activeSpotData.spot.lat, activeSpotData.spot.lon, activeSpotData.spot.name)}
-                className="h-10 px-2.5 bg-sky-700 hover:bg-sky-650 text-sky-100 text-[11px] font-semibold border-l border-sky-500 hidden xs:flex items-center"
-                title="Ouvrir dans Apple Plans"
-              >
-                Plans
-              </button>
-
-              <button
-                onClick={() => openWaze(activeSpotData.spot.lat, activeSpotData.spot.lon)}
-                className="h-10 px-2 bg-sky-750 hover:bg-sky-700 text-sky-200 text-[10px] font-semibold border-l border-sky-500 hidden md:flex items-center"
-                title="Ouvrir dans Waze"
-              >
-                Waze
-              </button>
-            </div>
+            {/* Bouton GPS unique & puissant */}
+            <button
+              onClick={() => openGPS(activeSpotData.spot.lat, activeSpotData.spot.lon, activeSpotData.spot.name)}
+              className="h-10 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition"
+            >
+              <Navigation className="w-3.5 h-3.5 fill-white" />
+              <span>Y aller</span>
+            </button>
 
           </div>
 
