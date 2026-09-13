@@ -226,6 +226,7 @@ export const App: React.FC = () => {
           score={evaluateSpotConditions(selectedSpot, selectedSpotTide)}
           tide={selectedSpotTide}
           isFavorite={favorites.includes(selectedSpot.id)}
+          isToday={selectedDayOffset === 0}
           onToggleFavorite={handleToggleFavorite}
           onClose={() => setSelectedSpot(null)}
         />

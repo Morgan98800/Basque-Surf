@@ -7,6 +7,7 @@ interface SpotDetailModalProps {
   score: SpotScore | null;
   tide: TideData | null;
   isFavorite: boolean;
+  isToday?: boolean;
   onToggleFavorite: (spotId: string) => void;
   onClose: () => void;
 }
@@ -16,6 +17,7 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   score,
   tide,
   isFavorite,
+  isToday = true,
   onToggleFavorite,
   onClose,
 }) => {
@@ -91,7 +93,9 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
           {/* Main Score Hero Card */}
           <div className="p-4 rounded-2xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-between gap-4">
             <div>
-              <span className="text-xs text-white/50 block mb-0.5 font-medium">Note de surf en direct</span>
+              <span className="text-xs text-white/50 block mb-0.5 font-medium">
+                {isToday ? 'Note de surf en direct' : 'Note prévisionnelle'}
+              </span>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight">{score.scoreFormatted}</span>
                 <span className="text-xs text-white/40 font-semibold">/10</span>
@@ -103,7 +107,7 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
 
             <div className="text-right text-xs space-y-1 text-white/80 font-medium">
               <div>
-                <span className="text-white/40">Hauteur d'eau : </span>
+                <span className="text-white/40">{isToday ? "Hauteur d'eau : " : "Marée estimée (midi) : "}</span>
                 <strong className="text-white font-mono">{tide.currentHeight}m</strong>
               </div>
               <div>
@@ -138,7 +142,7 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
               <div className="h-24 flex items-end justify-between gap-1 pt-3 pb-1">
                 {tide.hourlyCurve.map((pt, idx) => {
                   const hNormalized = Math.max(0.1, Math.min(1, (pt.height - 0.5) / 4.0));
-                  const isCurrent = idx === currentHour;
+                  const isCurrent = isToday && idx === currentHour;
                   const isOptimal = pt.height >= spot.optimalTideRange.minHeight && pt.height <= spot.optimalTideRange.maxHeight;
 
                   return (
@@ -166,10 +170,12 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
                   <span className="w-2 h-2 rounded-full bg-[#34C759]"></span>
                   <span>Fenêtre idéale pour ce spot</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#FF9500]"></span>
-                  <span>Heure actuelle</span>
-                </div>
+                {isToday && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#FF9500]"></span>
+                    <span>Heure actuelle</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -215,8 +215,13 @@ export async function fetchTideData(townSlug: string = 'biarritz', dayOffset: nu
       }
     }
 
-    const nextHigh = extremes.find(e => e.type === 'high' && e.timestamp >= evalMs) || extremes.find(e => e.type === 'high')!;
-    const nextLow = extremes.find(e => e.type === 'low' && e.timestamp >= evalMs) || extremes.find(e => e.type === 'low')!;
+    const nextHigh = (dayExtremes.find(e => e.type === 'high' && (dayOffset === 0 ? e.timestamp >= evalMs : true))) 
+      || dayExtremes.find(e => e.type === 'high')
+      || extremes.find(e => e.type === 'high')!;
+
+    const nextLow = (dayExtremes.find(e => e.type === 'low' && (dayOffset === 0 ? e.timestamp >= evalMs : true))) 
+      || dayExtremes.find(e => e.type === 'low')
+      || extremes.find(e => e.type === 'low')!;
 
     // Coefficient du jour (sur le premier ou plus haut extrême du jour)
     const activeCoeff = dayExtremes.find(e => e.type === 'high' && e.coefficient)?.coefficient 

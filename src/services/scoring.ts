@@ -11,7 +11,8 @@ export function evaluateSpotConditions(spot: Spot, tide: TideData): SpotScore {
   // 1. CAS PARTICULIER CRITIQUE : Côte des Basques à marée haute
   if (spot.id === 'biarritz-cote-des-basques') {
     if (currentHeight >= 3.3 || currentPhase === 'high') {
-      const score = Number((1.2 + Math.random() * 0.7).toFixed(1)); // ex: 1,4 / 10
+      const cliffFactor = Math.min(1.0, Math.max(0, (currentHeight - 3.2) / 1.5));
+      const score = Number((1.8 - cliffFactor * 0.8).toFixed(1)); // Score stable 1.0 - 1.8
       return {
         score,
         scoreFormatted: score.toFixed(1).replace('.', ','),
@@ -122,20 +123,54 @@ export function evaluateSpotConditions(spot: Spot, tide: TideData): SpotScore {
  */
 function findBestWindow(spot: Spot, curve: { time: string; height: number }[]): string {
   const { minHeight, maxHeight } = spot.optimalTideRange;
-  const matchingHours: string[] = [];
+  const matchingPoints = curve.filter(
+    (p) => p.height >= minHeight - 0.15 && p.height <= maxHeight + 0.15
+  );
 
-  for (const point of curve) {
-    if (point.height >= minHeight - 0.15 && point.height <= maxHeight + 0.15) {
-      matchingHours.push(point.time);
+  if (matchingPoints.length === 0) {
+    return 'Conditions marginales';
+  }
+
+  // Grouper en blocs continus d'heures consécutives
+  const blocks: { start: string; end: string; startHour: number; endHour: number }[] = [];
+  let currentBlock: { time: string; hour: number }[] = [];
+
+  for (const pt of matchingPoints) {
+    const hour = parseInt(pt.time.split(':')[0], 10);
+    if (currentBlock.length === 0) {
+      currentBlock.push({ time: pt.time, hour });
+    } else {
+      const lastHour = currentBlock[currentBlock.length - 1].hour;
+      if (hour === lastHour + 1) {
+        currentBlock.push({ time: pt.time, hour });
+      } else {
+        const startH = currentBlock[0].hour;
+        const endH = currentBlock[currentBlock.length - 1].hour + 1;
+        blocks.push({
+          start: `${startH.toString().padStart(2, '0')}:00`,
+          end: `${Math.min(24, endH).toString().padStart(2, '0')}:00`,
+          startHour: startH,
+          endHour: endH,
+        });
+        currentBlock = [{ time: pt.time, hour }];
+      }
     }
   }
 
-  if (matchingHours.length === 0) {
-    return 'Conditions marginales aujourd’hui';
+  if (currentBlock.length > 0) {
+    const startH = currentBlock[0].hour;
+    const endH = currentBlock[currentBlock.length - 1].hour + 1;
+    blocks.push({
+      start: `${startH.toString().padStart(2, '0')}:00`,
+      end: `${Math.min(24, endH).toString().padStart(2, '0')}:00`,
+      startHour: startH,
+      endHour: endH,
+    });
   }
 
-  const firstHour = matchingHours[0];
-  const lastHour = matchingHours[matchingHours.length - 1];
+  // Privilégier les sessions de jour (07:00 à 21:00) si disponibles
+  const daytimeBlocks = blocks.filter((b) => b.endHour >= 7 && b.startHour <= 21);
+  const selectedBlocks = daytimeBlocks.length > 0 ? daytimeBlocks : blocks;
 
-  return `${firstHour} - ${lastHour}`;
+  return selectedBlocks.map((b) => `${b.start} - ${b.end}`).join(' & ');
 }
