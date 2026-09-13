@@ -79,10 +79,10 @@ export const SpotCard: React.FC<SpotCardProps> = ({
               e.stopPropagation();
               onToggleFavorite(spot.id);
             }}
-            className="w-8 h-8 -mr-1.5 -mt-1 flex items-center justify-center rounded-full bg-white/[0.04] hover:bg-white/[0.12] border border-white/[0.06] text-white/40 hover:text-[#FF9500] active:scale-90 transition"
+            className="w-10 h-10 -mr-2 -mt-2 flex items-center justify-center rounded-full bg-white/[0.04] hover:bg-white/[0.12] border border-white/[0.06] text-white/40 hover:text-[#FF9500] active:scale-90 transition"
             aria-label={isFavorite ? 'Retirer favori' : 'Ajouter favori'}
           >
-            <Star className={`w-4 h-4 stroke-[2] ${isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
+            <Star className={`w-4.5 h-4.5 stroke-[2] ${isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
           </button>
         </div>
 

@@ -157,9 +157,21 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       {/* Conteneur Leaflet */}
       <div ref={mapContainerRef} className="flex-1 w-full h-full z-10" />
 
+      {/* Overlay État Vide sur la Carte */}
+      {spots.length === 0 && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center p-6 bg-black/60 backdrop-blur-md animate-fade-in">
+          <div className="text-center p-6 rounded-3xl bg-[#1c1c1e]/90 border border-white/[0.12] max-w-sm space-y-2 shadow-2xl">
+            <h4 className="text-sm font-semibold text-white">Aucun spot sur cette zone</h4>
+            <p className="text-xs text-white/50 leading-relaxed">
+              Essayez de réinitialiser la recherche ou de sélectionner « Toute la Côte Basque ».
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Fiche d'action flottante sous la carte façon Apple Maps Card */}
       {activeSpotData && (
-        <div className="absolute bottom-3 inset-x-3 sm:inset-x-6 z-20 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/[0.12] rounded-3xl p-4 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 animate-slide-up">
+        <div className="absolute bottom-3 inset-x-3 sm:inset-x-6 z-20 bg-[#1c1c1e]/95 backdrop-blur-2xl border border-white/[0.14] rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-slide-up">
           
           {/* Infos spot */}
           <div className="flex items-start justify-between sm:justify-start gap-3 min-w-0">
@@ -191,13 +203,13 @@ export const SpotMap: React.FC<SpotMapProps> = ({
             <span className="text-xs text-white/50 font-sans font-medium">/10</span>
           </div>
 
-          {/* Boutons d'action */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Boutons d'action adaptés mobile & desktop */}
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
             
             {/* Favori */}
             <button
               onClick={() => onToggleFavorite(activeSpotData.spot.id)}
-              className="h-10 w-10 flex items-center justify-center rounded-full bg-white/[0.08] border border-white/[0.1] text-white/60 hover:text-[#FF9500] active:scale-95 transition"
+              className="h-10 w-10 shrink-0 flex items-center justify-center rounded-full bg-white/[0.08] border border-white/[0.1] text-white/60 hover:text-[#FF9500] active:scale-95 transition"
               aria-label="Favori"
             >
               <Star className={`w-4 h-4 stroke-[2] ${activeSpotData.isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
@@ -206,16 +218,16 @@ export const SpotMap: React.FC<SpotMapProps> = ({
             {/* Fiche & Marée */}
             <button
               onClick={() => onOpenDetails(activeSpotData.spot)}
-              className="h-10 px-4 rounded-full bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.1] text-white text-xs font-semibold flex items-center gap-1.5 active:scale-95 transition"
+              className="flex-1 sm:flex-initial h-10 px-3.5 sm:px-4 rounded-full bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.1] text-white text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition"
             >
-              <span>Marée & Fiche</span>
+              <span>Fiche</span>
               <ChevronRight className="w-3.5 h-3.5 text-white/60 stroke-[2.5]" />
             </button>
 
             {/* Bouton GPS unique & puissant façon Apple Maps */}
             <button
               onClick={() => openGPS(activeSpotData.spot.lat, activeSpotData.spot.lon, activeSpotData.spot.name)}
-              className="h-10 px-5 rounded-full bg-[#007AFF] hover:bg-[#0062cc] text-white text-xs font-semibold flex items-center gap-1.5 shadow-md active:scale-95 transition"
+              className="flex-1 sm:flex-initial h-10 px-4 sm:px-5 rounded-full bg-[#007AFF] hover:bg-[#0062cc] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition"
             >
               <Navigation className="w-3.5 h-3.5 fill-white stroke-white" />
               <span>Y aller</span>

@@ -229,14 +229,14 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
 
         </div>
 
-        {/* Bottom Action: Bouton Apple Style Pleine Largeur */}
-        <div className="p-4 border-t border-white/[0.08] bg-[#161618]">
+        {/* Bottom Action: Bouton Apple Style Pleine Largeur avec Safe Area iOS */}
+        <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-white/[0.08] bg-[#161618]">
           <button
             onClick={openGPS}
             className="w-full h-11 px-6 rounded-full bg-[#007AFF] hover:bg-[#0062cc] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition shadow-md"
           >
             <Navigation className="w-4 h-4 fill-white stroke-white" />
-            <span>Itinéraire Apple Plans</span>
+            <span>{/iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent) ? 'Itinéraire Apple Plans' : 'Itinéraire Google Maps'}</span>
           </button>
         </div>
 

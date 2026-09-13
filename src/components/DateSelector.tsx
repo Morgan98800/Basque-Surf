@@ -36,8 +36,8 @@ export const DateSelector: React.FC<DateSelectorProps> = ({
   });
 
   return (
-    <div className="w-full">
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+    <div className="w-full relative">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth">
         {days.map((item) => {
           const isSelected = selectedOffset === item.offset;
 
@@ -45,7 +45,7 @@ export const DateSelector: React.FC<DateSelectorProps> = ({
             <button
               key={item.offset}
               onClick={() => onSelectOffset(item.offset)}
-              className={`flex flex-col items-center justify-center min-w-[3.8rem] sm:min-w-[4.2rem] py-2.5 px-2 rounded-2xl transition-all duration-300 active:scale-95 shrink-0 ${
+              className={`flex flex-col items-center justify-center min-w-[3.6rem] sm:min-w-[4.2rem] py-2 px-2 rounded-2xl transition-all duration-300 active:scale-95 shrink-0 ${
                 isSelected
                   ? 'bg-gradient-to-b from-white to-white/90 text-black font-bold shadow-[0_4px_20px_rgba(255,255,255,0.3)] border border-white'
                   : 'liquid-glass-pill hover:bg-white/[0.12] text-white/70 hover:text-white'
@@ -65,6 +65,8 @@ export const DateSelector: React.FC<DateSelectorProps> = ({
           );
         })}
       </div>
+      {/* Indicateur discret de défilement horizontal sur mobile */}
+      <div className="pointer-events-none absolute right-0 top-0 bottom-1 w-6 bg-gradient-to-l from-[#03070d] to-transparent sm:hidden" />
     </div>
   );
 };
