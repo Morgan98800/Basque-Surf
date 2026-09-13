@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Spot, SpotScore, TideData } from '../types/index';
 import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, Navigation } from 'lucide-react';
 import { openDirectMaps } from './GPSActionSheet';
@@ -23,6 +23,13 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   onClose,
 }) => {
   const [scrubIndex, setScrubIndex] = useState<number | null>(null);
+  const [dragY, setDragY] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  const dragStartY = useRef<number>(0);
+  const currentDragY = useRef<number>(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef<number>(0);
 
   // Recul de la vue parente façon iOS 18
   useEffect(() => {
@@ -46,53 +53,138 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   const activeHourIndex = scrubIndex !== null ? scrubIndex : (isToday ? Math.min(23, currentHour) : 12);
   const activeHourlyPoint = tide.hourlyCurve[activeHourIndex] || tide.hourlyCurve[0];
 
+  // Gestion du glissement vers le bas (Swipe-to-dismiss)
+  const handleDragStart = (clientY: number) => {
+    dragStartY.current = clientY;
+    currentDragY.current = 0;
+    setIsDragging(true);
+  };
+
+  const handleDragMove = (clientY: number) => {
+    if (!isDragging) return;
+    const deltaY = clientY - dragStartY.current;
+    if (deltaY > 0) {
+      currentDragY.current = deltaY;
+      setDragY(deltaY);
+    } else {
+      currentDragY.current = 0;
+      setDragY(0);
+    }
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (currentDragY.current > 75) {
+      onClose();
+    } else {
+      setDragY(0);
+    }
+    currentDragY.current = 0;
+  };
+
+  // Glissement depuis le haut du contenu défilable
+  const handleContentTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleContentTouchMove = (e: React.TouchEvent) => {
+    const scrollEl = scrollContainerRef.current;
+    if (!scrollEl) return;
+    if (scrollEl.scrollTop <= 0) {
+      const deltaY = e.touches[0].clientY - touchStartY.current;
+      if (deltaY > 0) {
+        currentDragY.current = deltaY;
+        setDragY(deltaY);
+      }
+    }
+  };
+
+  const handleContentTouchEnd = () => {
+    if (currentDragY.current > 75) {
+      onClose();
+    } else {
+      setDragY(0);
+    }
+    currentDragY.current = 0;
+  };
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex sm:items-center items-end justify-center bg-black/70 backdrop-blur-md p-0 sm:p-4"
+      className="fixed inset-0 z-50 flex sm:items-center items-end justify-center bg-black/70 backdrop-blur-md p-0 sm:p-4 transition-opacity duration-200"
       onClick={onClose}
     >
       <div 
-        className="w-full sm:max-w-lg bg-[#1c1c1e] border-t sm:border border-white/[0.12] rounded-t-[2.5rem] sm:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col animate-slide-up overflow-hidden"
+        className="w-full sm:max-w-lg bg-[#1c1c1e] border-t sm:border border-white/[0.12] rounded-t-[2.5rem] sm:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col animate-slide-up overflow-hidden transition-transform duration-200"
+        style={{
+          transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
+          transition: isDragging ? 'none' : 'transform 0.25s cubic-bezier(0.32, 0.72, 0, 1)'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* iOS Drag Indicator / Grabber */}
-        <div className="pt-3 pb-1">
-          <div className="w-9 h-1.5 rounded-full bg-white/20 mx-auto" />
+        {/* iOS Drag Indicator / Poignée de glissement tactile vers le bas */}
+        <div 
+          className="pt-4 pb-2.5 cursor-grab active:cursor-grabbing flex items-center justify-center select-none w-full touch-none"
+          onTouchStart={(e) => handleDragStart(e.touches[0].clientY)}
+          onTouchMove={(e) => handleDragMove(e.touches[0].clientY)}
+          onTouchEnd={handleDragEnd}
+          onMouseDown={(e) => handleDragStart(e.clientY)}
+          onMouseMove={(e) => handleDragMove(e.clientY)}
+          onMouseUp={handleDragEnd}
+          onClick={onClose}
+          title="Faire glisser vers le bas pour fermer"
+        >
+          <div className="w-12 h-1.5 rounded-full bg-white/35 hover:bg-white/60 transition-colors" />
         </div>
 
-        {/* Header Bar */}
-        <div className="px-5 py-3 border-b border-white/[0.08] flex items-center justify-between">
-          <div>
-            <div className="text-xs font-semibold text-[#0A84FF]">
+        {/* Header Bar avec Croix Apple agrandie et repositionnée */}
+        <div 
+          className="px-5 pt-1 pb-4 border-b border-white/[0.08] flex items-center justify-between select-none"
+          onTouchStart={(e) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            handleDragStart(e.touches[0].clientY);
+          }}
+          onTouchMove={(e) => handleDragMove(e.touches[0].clientY)}
+          onTouchEnd={handleDragEnd}
+        >
+          <div className="min-w-0 pr-3">
+            <div className="text-xs font-semibold text-[#0A84FF] tracking-wide mb-0.5">
               {spot.town} • {spot.level}
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight truncate">
               {spot.name}
             </h2>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 shrink-0">
+            {/* Bouton Favori */}
             <button
               onClick={() => onToggleFavorite(spot.id)}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white/60 hover:text-[#FF9500] active:scale-90 transition"
-              aria-label="Favori"
+              className="w-11 h-11 flex items-center justify-center rounded-full bg-white/[0.12] hover:bg-white/[0.18] active:bg-white/[0.25] text-white/70 hover:text-[#FF9500] active:scale-90 transition shadow-sm"
+              aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
             >
-              <Star className={`w-4.5 h-4.5 stroke-[2] ${isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
+              <Star className={`w-5 h-5 stroke-[2] ${isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
             </button>
 
+            {/* Bouton Fermer (Croix Apple 44x44px distincte et bien visible) */}
             <button
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white/60 hover:text-white active:scale-90 transition"
-              aria-label="Fermer"
+              className="w-11 h-11 flex items-center justify-center rounded-full bg-white/[0.14] hover:bg-white/[0.22] active:bg-white/[0.30] text-white active:scale-90 transition shadow-sm"
+              aria-label="Fermer la fiche du spot"
             >
-              <X className="w-4.5 h-4.5 stroke-[2.2]" />
+              <X className="w-5 h-5 stroke-[2.8]" />
             </button>
           </div>
         </div>
 
-        {/* Scrollable Content avec masque de sécurité façon iOS */}
-        <div className="p-4 sm:p-5 space-y-4 overflow-y-auto overscroll-contain text-xs sheet-scroll">
+        {/* Scrollable Content avec détection de swipe-down au sommet */}
+        <div 
+          ref={scrollContainerRef}
+          onTouchStart={handleContentTouchStart}
+          onTouchMove={handleContentTouchMove}
+          onTouchEnd={handleContentTouchEnd}
+          className="p-4 sm:p-5 space-y-4 overflow-y-auto overscroll-contain text-xs sheet-scroll"
+        >
           
           {/* Main Score Hero Card */}
           <div className="p-4 rounded-2xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-between gap-4">
