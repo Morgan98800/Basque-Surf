@@ -3,32 +3,44 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-slate-950 text-slate-100 min-h-screen font-sans;
-    background-image: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.08) 0%, transparent 60%);
+  :root {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    @apply bg-nautical-900 text-slate-100 min-h-screen font-sans;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #0f172a;
-}
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+/* Touch & Mobile UX */
+button, a {
+  touch-action: manipulation;
 }
 
-.scrollbar-none::-webkit-scrollbar {
+/* Smooth bottom sheet animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Horizontal tab scroll snapping without scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.scrollbar-none {
+.hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

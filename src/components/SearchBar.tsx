@@ -1,6 +1,6 @@
 import React from 'react';
-import { Search, X, Star, SlidersHorizontal, MapPin } from 'lucide-react';
-import { BasqueTown } from '../types';
+import { Search, X, Star } from 'lucide-react';
+import { BasqueTown } from '../types/index';
 import { BASQUE_TOWNS } from '../data/spots';
 
 interface SearchBarProps {
@@ -27,93 +27,89 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onSortChange,
 }) => {
   return (
-    <div className="space-y-3.5">
+    <div className="space-y-2.5">
       
-      {/* Search Bar & Controls */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-        {/* Search Input */}
+      {/* Search Bar + Favorites Button */}
+      <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <Search className="w-4 h-4" />
-          </div>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Rechercher une plage (ex: Côte des Basques, Lafitenia, Cavaliers...)"
-            className="w-full pl-10 pr-10 py-2.5 bg-slate-800/90 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-transparent transition shadow-inner"
+            placeholder="Rechercher une plage..."
+            className="w-full h-11 pl-9 pr-8 bg-nautical-800 border border-nautical-700 rounded-xl text-slate-100 placeholder-slate-400 text-sm focus:outline-none focus:border-sky-500 transition shadow-sm"
           />
           {searchTerm && (
             <button
               onClick={() => onSearchChange('')}
-              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-200"
+              aria-label="Effacer recherche"
             >
               <X className="w-4 h-4" />
             </button>
           )}
         </div>
 
-        {/* Favorites Filter Button */}
+        {/* Favorite Filter Toggle */}
         <button
           onClick={onToggleFavoritesOnly}
-          className={`flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium border transition shrink-0 ${
+          className={`h-11 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shrink-0 border transition active:scale-95 ${
             showFavoritesOnly
-              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-lg shadow-amber-500/10'
-              : 'bg-slate-800/80 text-slate-300 border-slate-700/80 hover:bg-slate-750 hover:text-white'
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
+              : 'bg-nautical-800 text-slate-300 border-nautical-700 hover:bg-nautical-750'
           }`}
+          aria-label="Filtrer par favoris"
         >
-          <Star className={`w-4 h-4 ${showFavoritesOnly ? 'fill-amber-400 text-amber-400' : 'text-slate-400'}`} />
-          <span>Favoris</span>
+          <Star className={`w-3.5 h-3.5 ${showFavoritesOnly ? 'fill-amber-400 text-amber-400' : 'text-slate-400'}`} />
+          <span className="hidden xs:inline">Favoris</span>
           {favoritesCount > 0 && (
-            <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
-              showFavoritesOnly ? 'bg-amber-400/30 text-amber-200' : 'bg-slate-700 text-slate-300'
+            <span className={`text-[11px] font-mono px-1.5 py-0.2 rounded-full ${
+              showFavoritesOnly ? 'bg-amber-400/30 text-amber-200' : 'bg-nautical-700 text-slate-300'
             }`}>
               {favoritesCount}
             </span>
           )}
         </button>
 
-        {/* Sort Select */}
-        <div className="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-1.5 shrink-0">
-          <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
-          <span className="text-xs text-slate-400">Tri :</span>
+        {/* Tri */}
+        <div className="hidden sm:flex items-center h-11 px-2.5 bg-nautical-800 border border-nautical-700 rounded-xl text-xs text-slate-300 shrink-0">
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as any)}
-            className="bg-transparent text-xs text-slate-200 font-medium focus:outline-none cursor-pointer"
+            className="bg-transparent text-xs text-slate-200 font-medium focus:outline-none cursor-pointer pr-1"
           >
-            <option value="score" className="bg-slate-800">Meilleure note</option>
-            <option value="town" className="bg-slate-800">Par ville</option>
-            <option value="name" className="bg-slate-800">Nom (A-Z)</option>
+            <option value="score" className="bg-nautical-850">Note max</option>
+            <option value="town" className="bg-nautical-850">Par ville</option>
+            <option value="name" className="bg-nautical-850">A-Z</option>
           </select>
         </div>
       </div>
 
-      {/* Town Filter Pills */}
-      <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+      {/* Swipeable Town Pills */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 hide-scrollbar -mx-3.5 px-3.5 sm:mx-0 sm:px-0">
         <button
           onClick={() => onTownChange('ALL')}
-          className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition font-medium ${
+          className={`h-8 px-3 rounded-lg text-xs font-medium whitespace-nowrap transition shrink-0 ${
             selectedTown === 'ALL'
-              ? 'bg-ocean-600 text-white shadow-md shadow-ocean-600/30'
-              : 'bg-slate-800/60 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+              ? 'bg-sky-600 text-white font-semibold'
+              : 'bg-nautical-800 text-slate-400 hover:text-slate-200 border border-nautical-750'
           }`}
         >
-          Toute la côte ({BASQUE_TOWNS.length} villes)
+          Toute la côte
         </button>
 
         {BASQUE_TOWNS.map((town) => (
           <button
             key={town}
             onClick={() => onTownChange(town)}
-            className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg whitespace-nowrap transition font-medium ${
+            className={`h-8 px-3 rounded-lg text-xs font-medium whitespace-nowrap transition shrink-0 ${
               selectedTown === town
-                ? 'bg-ocean-600 text-white shadow-md shadow-ocean-600/30'
-                : 'bg-slate-800/60 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                ? 'bg-sky-600 text-white font-semibold'
+                : 'bg-nautical-800 text-slate-400 hover:text-slate-200 border border-nautical-750'
             }`}
           >
-            <MapPin className="w-3 h-3 opacity-60" />
-            <span>{town}</span>
+            {town}
           </button>
         ))}
       </div>

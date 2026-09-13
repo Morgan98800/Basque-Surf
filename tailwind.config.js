@@ -4,36 +4,35 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        ocean: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+        nautical: {
+          950: '#040810',
+          900: '#070e18',
+          850: '#0b1624',
+          800: '#101e30',
+          750: '#16283f',
+          700: '#1e3450',
+          600: '#2b496e',
+          500: '#3e6594',
         },
-        basque: {
-          red: '#c92a2a',
-          darkRed: '#a61e1e',
-          green: '#2b8a3e',
+        ikurrina: {
+          red: '#c0262d',
+          darkRed: '#991b1b',
+          green: '#15803d',
         },
-        sand: {
-          50: '#faf7f2',
-          100: '#f4ede2',
-          200: '#e8dbcb',
-          300: '#d7c0aa',
+        tide: {
+          good: '#10b981',
+          fair: '#f59e0b',
+          poor: '#64748b',
+          danger: '#ef4444',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       }
     },
   },

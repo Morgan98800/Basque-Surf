@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, ExternalLink, ShieldCheck } from 'lucide-react';
+import { X, Star, AlertTriangle, Wind, Waves, Compass, Clock, ExternalLink } from 'lucide-react';
 
 interface SpotDetailModalProps {
   spot: Spot | null;
@@ -19,142 +19,131 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
   onToggleFavorite,
   onClose,
 }) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   if (!spot || !score || !tide) return null;
 
   const currentHour = new Date().getHours();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-sm overflow-y-auto">
+    <div 
+      className="fixed inset-0 z-50 flex sm:items-center items-end justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4"
+      onClick={onClose}
+    >
       <div 
-        className="relative w-full max-w-2xl bg-slate-900 border border-slate-750 rounded-2xl shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150"
+        className="w-full sm:max-w-lg bg-nautical-900 border-t sm:border border-nautical-700 rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[90vh] flex flex-col animate-slide-up overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Mobile Swipe Handle */}
+        <div className="sm:hidden pt-2.5 pb-1">
+          <div className="w-10 h-1 rounded-full bg-nautical-700 mx-auto" />
+        </div>
+
         {/* Header Bar */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-800 bg-slate-850">
-          <div className="space-y-0.5">
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-semibold text-ocean-400 tracking-wider uppercase">
-                {spot.town}
-              </span>
-              <span className="text-slate-600">•</span>
-              <span className="text-xs text-slate-400">
-                {spot.type === 'beach_break' ? 'Beach break' : spot.type === 'reef_break' ? 'Reef break' : 'Point break'}
-              </span>
+        <div className="px-4 py-3 border-b border-nautical-750 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-semibold text-sky-400 uppercase tracking-wider">
+              {spot.town} • {spot.level}
             </div>
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-white">
               {spot.name}
             </h2>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => onToggleFavorite(spot.id)}
-              className={`p-2.5 rounded-xl border transition ${
-                isFavorite 
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                  : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
-              }`}
-              title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-nautical-800 text-slate-400 hover:text-amber-400 border border-nautical-700 active:scale-95 transition"
+              aria-label="Favori"
             >
-              <Star className={`w-5 h-5 ${isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} />
+              <Star className={`w-4 h-4 ${isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} />
             </button>
 
             <button
               onClick={onClose}
-              className="p-2.5 rounded-xl bg-slate-800 text-slate-400 border border-slate-700 hover:text-white transition"
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-nautical-800 text-slate-400 hover:text-white border border-nautical-700 active:scale-95 transition"
+              aria-label="Fermer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-5 sm:p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+        {/* Scrollable Content */}
+        <div className="p-4 space-y-4 overflow-y-auto overscroll-contain text-xs">
           
-          {/* Main Score & Diagnostics Hero */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-800/60 border border-slate-750 p-4 rounded-xl">
-            {/* Note sur 10 */}
-            <div className="sm:col-span-1 flex flex-col items-center justify-center p-3 bg-slate-900/80 rounded-lg border border-slate-750/80 text-center">
-              <span className="text-xs text-slate-400 font-medium mb-1">Note de surf actuelle</span>
-              <div className="flex items-baseline space-x-1">
-                <span className="text-4xl font-extrabold text-white font-mono">{score.scoreFormatted}</span>
-                <span className="text-sm text-slate-400 font-semibold">/10</span>
+          {/* Main Score Hero Card */}
+          <div className="p-3.5 rounded-xl bg-nautical-800 border border-nautical-700 flex items-center justify-between gap-4">
+            <div>
+              <span className="text-[11px] text-slate-400 block mb-0.5">Note de surf en direct</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-extrabold text-white font-mono">{score.scoreFormatted}</span>
+                <span className="text-xs text-slate-400 font-bold">/10</span>
               </div>
-              <span className="mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-ocean-500/20 text-ocean-300 border border-ocean-500/30">
+              <span className="text-[11px] font-semibold text-sky-400">
                 {score.label}
               </span>
             </div>
 
-            {/* Détails marée spot */}
-            <div className="sm:col-span-2 flex flex-col justify-center space-y-2 text-xs">
+            <div className="text-right text-[11px] space-y-1 text-slate-300">
               <div>
-                <span className="text-slate-400">Diagnostic marée : </span>
-                <span className="text-slate-200">{score.explanation}</span>
+                <span className="text-slate-400">Eau actuelle : </span>
+                <strong className="text-white font-mono">{tide.currentHeight}m</strong>
               </div>
               <div>
-                <span className="text-slate-400">Fenêtre idéale d'eau : </span>
-                <strong className="text-ocean-300">{spot.optimalTideRange.minHeight}m à {spot.optimalTideRange.maxHeight}m</strong>
-                <span className="text-slate-400"> (actuellement : {tide.currentHeight}m)</span>
-              </div>
-              <div>
-                <span className="text-slate-400">Meilleur créneau du jour : </span>
-                <span className="text-emerald-400 font-semibold">{score.bestWindowToday}</span>
+                <span className="text-slate-400">Créneau idéal : </span>
+                <strong className="text-emerald-400 font-mono">{score.bestWindowToday}</strong>
               </div>
             </div>
           </div>
 
           {/* Dangers & Alertes spécifiques */}
           {score.warning && (
-            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start space-x-2.5">
-              <AlertTriangle className="w-5 h-5 shrink-0 text-rose-400 mt-0.5" />
-              <div>
-                <strong className="font-semibold block mb-0.5">Spécificités et sécurité :</strong>
-                <span className="leading-relaxed text-rose-200/90">{score.warning}</span>
-              </div>
+            <div className="p-3 rounded-xl bg-rose-950/70 border border-rose-800 text-rose-300 text-xs flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
+              <span className="leading-snug">{score.warning}</span>
             </div>
           )}
 
-          {/* Courbe Visuelle de Marée 24H */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <h4 className="font-semibold text-slate-200 flex items-center gap-1.5">
-                <Waves className="w-4 h-4 text-ocean-400" />
-                <span>Courbe des marées sur 24h ({tide.townName})</span>
-              </h4>
-              <span className="text-slate-400 text-[11px]">
-                Zone optimale : <strong className="text-ocean-300">{spot.optimalTideRange.minHeight}m - {spot.optimalTideRange.maxHeight}m</strong>
-              </span>
+          {/* Diagnostic texte */}
+          <div className="p-3 rounded-xl bg-nautical-850 border border-nautical-750 text-slate-300 leading-relaxed">
+            <span className="font-semibold text-white block mb-1">Analyse des marées</span>
+            <p>{score.explanation}</p>
+          </div>
+
+          {/* Courbe Horaire 24H */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="font-semibold text-slate-300">Courbe de marée sur 24h ({tide.townName})</span>
+              <span className="text-slate-400">Idéal : {spot.optimalTideRange.minHeight}m - {spot.optimalTideRange.maxHeight}m</span>
             </div>
 
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
-              <div className="h-28 flex items-end justify-between gap-1 pt-4 pb-1">
+            <div className="bg-nautical-850 border border-nautical-750 rounded-xl p-3">
+              <div className="h-24 flex items-end justify-between gap-1 pt-3 pb-1">
                 {tide.hourlyCurve.map((pt, idx) => {
                   const hNormalized = Math.max(0.1, Math.min(1, (pt.height - 0.5) / 4.0));
                   const isCurrent = idx === currentHour;
                   const isOptimal = pt.height >= spot.optimalTideRange.minHeight && pt.height <= spot.optimalTideRange.maxHeight;
 
                   return (
-                    <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group/bar relative">
-                      {/* Tooltip on hover */}
-                      <div className="absolute bottom-full mb-2 hidden group-hover/bar:flex flex-col items-center z-20 pointer-events-none">
-                        <div className="bg-slate-800 text-[10px] text-white px-2 py-1 rounded shadow-lg border border-slate-700 whitespace-nowrap">
-                          <strong>{pt.time}</strong>: {pt.height}m
-                          {isOptimal && <span className="text-emerald-400 block font-medium">Idéal pour {spot.name}</span>}
-                        </div>
-                      </div>
-
-                      {/* Bar indicator */}
+                    <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end relative">
                       <div
                         style={{ height: `${hNormalized * 100}%` }}
                         className={`w-full rounded-t transition-all ${
                           isCurrent
-                            ? 'bg-amber-400 ring-2 ring-amber-400/40 shadow-lg shadow-amber-400/20'
+                            ? 'bg-amber-400 ring-2 ring-amber-400/40'
                             : isOptimal
-                            ? 'bg-emerald-500/80 group-hover/bar:bg-emerald-400'
-                            : 'bg-slate-700 group-hover/bar:bg-slate-600'
+                            ? 'bg-emerald-500'
+                            : 'bg-nautical-700'
                         }`}
                       />
-                      <span className={`text-[9px] mt-1 font-mono ${isCurrent ? 'text-amber-400 font-bold' : 'text-slate-500'}`}>
+                      <span className={`text-[8px] mt-1 font-mono ${isCurrent ? 'text-amber-400 font-bold' : 'text-slate-500'}`}>
                         {idx % 4 === 0 ? pt.time.split(':')[0] + 'h' : ''}
                       </span>
                     </div>
@@ -162,84 +151,77 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
                 })}
               </div>
 
-              <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2 pt-2 border-t border-slate-800/80 px-1">
-                <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span>
-                  <span>Hauteur idéale pour surfer</span>
+              <div className="flex items-center justify-between text-[10px] text-slate-400 mt-2 pt-2 border-t border-nautical-750">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-sm bg-emerald-500"></span>
+                  <span>Fenêtre idéale pour ce spot</span>
                 </div>
-                <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-2.5 rounded-sm bg-amber-400"></span>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-sm bg-amber-400"></span>
                   <span>Heure actuelle</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Fiche Technique du Spot */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-              Fiche Technique
-            </h4>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-750 flex items-start space-x-2.5">
-                <Wind className="w-4 h-4 text-ocean-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-slate-300 block">Vent favorable</strong>
-                  <span className="text-slate-400">{spot.bestWind}</span>
-                </div>
+          {/* Fiche Technique */}
+          <div className="grid grid-cols-2 gap-2 text-[11px]">
+            <div className="p-2.5 rounded-lg bg-nautical-850 border border-nautical-750">
+              <div className="flex items-center gap-1 text-slate-400 mb-0.5">
+                <Wind className="w-3 h-3 text-sky-400" />
+                <span className="font-semibold">Vent</span>
               </div>
-
-              <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-750 flex items-start space-x-2.5">
-                <Waves className="w-4 h-4 text-ocean-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-slate-300 block">Houle optimale</strong>
-                  <span className="text-slate-400">{spot.bestSwell}</span>
-                </div>
-              </div>
-
-              <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-750 flex items-start space-x-2.5">
-                <Clock className="w-4 h-4 text-ocean-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-slate-300 block">Marée recommandée</strong>
-                  <span className="text-slate-400">{spot.tideDescription}</span>
-                </div>
-              </div>
-
-              <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-750 flex items-start space-x-2.5">
-                <Compass className="w-4 h-4 text-ocean-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-slate-300 block">Niveau de surf</strong>
-                  <span className="text-slate-400">{spot.level}</span>
-                </div>
-              </div>
+              <span className="text-slate-200">{spot.bestWind}</span>
             </div>
 
-            <p className="text-xs text-slate-300 bg-slate-800/30 p-3 rounded-lg border border-slate-800 leading-relaxed">
-              {spot.description}
-            </p>
+            <div className="p-2.5 rounded-lg bg-nautical-850 border border-nautical-750">
+              <div className="flex items-center gap-1 text-slate-400 mb-0.5">
+                <Waves className="w-3 h-3 text-sky-400" />
+                <span className="font-semibold">Houle</span>
+              </div>
+              <span className="text-slate-200">{spot.bestSwell}</span>
+            </div>
+
+            <div className="p-2.5 rounded-lg bg-nautical-850 border border-nautical-750">
+              <div className="flex items-center gap-1 text-slate-400 mb-0.5">
+                <Clock className="w-3 h-3 text-sky-400" />
+                <span className="font-semibold">Marée</span>
+              </div>
+              <span className="text-slate-200">{spot.tideDescription}</span>
+            </div>
+
+            <div className="p-2.5 rounded-lg bg-nautical-850 border border-nautical-750">
+              <div className="flex items-center gap-1 text-slate-400 mb-0.5">
+                <Compass className="w-3 h-3 text-sky-400" />
+                <span className="font-semibold">Niveau</span>
+              </div>
+              <span className="text-slate-200">{spot.level}</span>
+            </div>
           </div>
 
-          {/* Localisation GPS & Attribution */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs pt-3 border-t border-slate-800 text-slate-400 gap-2">
-            <div className="flex items-center space-x-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-[11px] text-slate-400">
-                {tide.attribution || 'Données IFREMER/PREVIMER · SHOM/REFMAR via CoefMarée'}
-              </span>
-            </div>
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lon}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-1 text-ocean-400 hover:text-ocean-300 transition"
-            >
-              <span>Itinéraire Google Maps</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          </div>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            {spot.description}
+          </p>
 
         </div>
+
+        {/* Bottom Action Footer */}
+        <div className="p-3 border-t border-nautical-750 bg-nautical-950 flex items-center justify-between gap-3">
+          <span className="text-[10px] text-slate-500 font-mono">
+            {spot.lat.toFixed(3)}, {spot.lon.toFixed(3)}
+          </span>
+
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lon}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="h-10 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-semibold text-xs flex items-center gap-1.5 transition"
+          >
+            <span>Itinéraire GPS</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+
       </div>
     </div>
   );
