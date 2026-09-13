@@ -134,26 +134,11 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-nautical-900 flex flex-col text-slate-100">
       
-      {/* Barre supérieure compacte intégrée (Header + Recherche + Filtres) */}
-      <header className="sticky top-0 z-40 bg-nautical-900/95 backdrop-blur-md border-b border-nautical-750 shadow-sm">
-        <Header tideData={activeHeaderTide} />
-        <div className="max-w-5xl mx-auto px-3.5 sm:px-6 pb-2 pt-0.5">
-          <SearchBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            selectedTown={selectedTown}
-            onTownChange={setSelectedTown}
-            showFavoritesOnly={showFavoritesOnly}
-            onToggleFavoritesOnly={() => setShowFavoritesOnly(!showFavoritesOnly)}
-            favoritesCount={favorites.length}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-          />
-        </div>
-      </header>
+      {/* Barre supérieure ultra-fine : Marque + Marée live IFREMER/SHOM */}
+      <Header tideData={activeHeaderTide} />
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 py-2.5 sm:py-3.5 space-y-2.5 sm:space-y-3">
+      {/* Main Content avec padding-bottom suffisant pour le dock inférieur */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 pt-3 pb-28 sm:pb-32 space-y-2.5 sm:space-y-3">
 
         {/* Dynamic View: Map or List */}
         {viewMode === 'map' ? (
@@ -220,8 +205,25 @@ export const App: React.FC = () => {
 
       </main>
 
+      {/* Dock inférieur ergonomique (Thumb Zone pour smartphone) */}
+      <nav className="fixed bottom-0 inset-x-0 z-40 bg-nautical-900/95 backdrop-blur-md border-t border-nautical-750/90 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(0,0,0,0.5)]">
+        <div className="max-w-5xl mx-auto px-3.5 sm:px-6">
+          <SearchBar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            selectedTown={selectedTown}
+            onTownChange={setSelectedTown}
+            showFavoritesOnly={showFavoritesOnly}
+            onToggleFavoritesOnly={() => setShowFavoritesOnly(!showFavoritesOnly)}
+            favoritesCount={favorites.length}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        </div>
+      </nav>
+
       {/* Clean Footer */}
-      <footer className="mt-8 border-t border-nautical-800 bg-nautical-950 py-4 text-[11px] text-slate-400">
+      <footer className="border-t border-nautical-800 bg-nautical-950 py-4 text-[11px] text-slate-400 mb-24 sm:mb-20">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-sm bg-ikurrina-red"></span>
