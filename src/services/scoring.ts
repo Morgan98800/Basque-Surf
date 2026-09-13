@@ -168,9 +168,9 @@ function findBestWindow(spot: Spot, curve: { time: string; height: number }[]): 
     });
   }
 
-  // Privilégier les sessions de jour (07:00 à 21:00) si disponibles
+  // Privilégier les sessions de jour (07:00 à 21:00) si disponibles, max 2 créneaux
   const daytimeBlocks = blocks.filter((b) => b.endHour >= 7 && b.startHour <= 21);
-  const selectedBlocks = daytimeBlocks.length > 0 ? daytimeBlocks : blocks;
+  const selectedBlocks = (daytimeBlocks.length > 0 ? daytimeBlocks : blocks).slice(0, 2);
 
   return selectedBlocks.map((b) => `${b.start} - ${b.end}`).join(' & ');
 }

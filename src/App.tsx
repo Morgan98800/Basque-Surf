@@ -41,6 +41,24 @@ export const App: React.FC = () => {
     }
   });
 
+  // Deep linking par URL (?view=map, ?spot=biarritz-cote-des-basques, ?town=Biarritz)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlView = params.get('view');
+      if (urlView === 'map' || urlView === 'list') setViewMode(urlView);
+
+      const urlTown = params.get('town');
+      if (urlTown) setSelectedTown(urlTown as BasqueTown);
+
+      const urlSpot = params.get('spot');
+      if (urlSpot) {
+        const found = BASQUE_SPOTS.find((s) => s.id === urlSpot);
+        if (found) setSelectedSpot(found);
+      }
+    } catch {}
+  }, []);
+
   // Chargement des marées officielles de la Côte Basque selon le jour choisi
   const loadAllTides = async (offset: number) => {
     setLoading(true);
@@ -145,7 +163,7 @@ export const App: React.FC = () => {
       <Header tideData={activeHeaderTide} />
 
       {/* Main Content avec padding-bottom pour la barre flottante inférieure */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 pt-3 pb-32 sm:pb-36 space-y-3">
+      <main className="flex-1 max-w-5xl w-full max-w-full min-w-0 mx-auto px-4 sm:px-6 pt-3 pb-36 sm:pb-36 space-y-3 overflow-x-hidden">
 
         {/* Sélecteur de date hebdomadaire Apple Style (7 jours) */}
         <DateSelector

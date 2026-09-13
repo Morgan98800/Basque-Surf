@@ -116,13 +116,13 @@ export const SpotCard: React.FC<SpotCardProps> = ({
       </div>
 
       {/* Footer Info: Capsule Créneau & Action style iOS */}
-      <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/[0.04] border border-white/[0.06] text-white/80">
-          <Clock className="w-3.5 h-3.5 text-[#0A84FF] stroke-[2]" />
-          <span className="text-[11px] font-mono text-white/90 font-medium">{score.bestWindowToday || 'Journée'}</span>
+      <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium gap-2">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/[0.04] border border-white/[0.06] text-white/80 min-w-0 flex-1">
+          <Clock className="w-3.5 h-3.5 text-[#0A84FF] shrink-0 stroke-[2]" />
+          <span className="text-[11px] font-mono text-white/90 font-medium truncate">{score.bestWindowToday || 'Journée'}</span>
         </div>
 
-        <div className="flex items-center gap-1 text-[#0A84FF] font-semibold group-hover:translate-x-1 transition-transform">
+        <div className="flex items-center gap-1 text-[#0A84FF] font-semibold group-hover:translate-x-1 transition-transform shrink-0">
           <span className="hidden sm:inline text-xs">Détails</span>
           <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
         </div>

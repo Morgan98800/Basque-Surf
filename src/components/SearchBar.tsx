@@ -97,7 +97,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`h-10 px-3.5 rounded-2xl border flex items-center gap-1.5 text-xs font-semibold shrink-0 transition active:scale-95 ${
+            className={`h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-2xl border flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold shrink-0 transition active:scale-95 ${
               selectedTown !== 'ALL'
                 ? 'bg-gradient-to-b from-white to-white/95 text-black border-white shadow-[0_2px_12px_rgba(255,255,255,0.25)]'
                 : 'liquid-glass-pill hover:bg-white/[0.14] text-white'
@@ -105,15 +105,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             title="Choisir une commune"
           >
             <MapPin className={`w-3.5 h-3.5 stroke-[2] ${selectedTown !== 'ALL' ? 'text-black' : 'text-[#38bdf8]'}`} />
-            <span className="max-w-[110px] sm:max-w-none truncate">{currentLabel}</span>
-            <ChevronDown className={`w-3.5 h-3.5 stroke-[2.5] transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
+            <span className="max-w-[85px] sm:max-w-none truncate">{currentLabel}</span>
+            <ChevronDown className={`w-3 h-3 stroke-[2.5] transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {/* Segmented Control iOS Liquid Glass */}
-          <div className="flex items-center liquid-glass-pill rounded-2xl p-1 h-10 shrink-0">
+          <div className="flex items-center liquid-glass-pill rounded-2xl p-0.5 sm:p-1 h-9 sm:h-10 shrink-0">
             <button
               onClick={() => onViewModeChange('list')}
-              className={`h-8 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all duration-300 ${
+              className={`h-7 sm:h-8 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all duration-300 ${
                 viewMode === 'list'
                   ? 'bg-gradient-to-b from-white/30 to-white/10 text-white shadow-md border border-white/20 font-bold'
                   : 'text-white/60 hover:text-white'
@@ -126,7 +126,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
             <button
               onClick={() => onViewModeChange('map')}
-              className={`h-8 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all duration-300 ${
+              className={`h-7 sm:h-8 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all duration-300 ${
                 viewMode === 'map'
                   ? 'bg-gradient-to-b from-white/30 to-white/10 text-white shadow-md border border-white/20 font-bold'
                   : 'text-white/60 hover:text-white'
@@ -141,14 +141,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           {/* Bouton Favoris Liquid Glass */}
           <button
             onClick={onToggleFavoritesOnly}
-            className={`h-10 px-3.5 rounded-2xl text-xs font-medium flex items-center gap-1.5 shrink-0 transition active:scale-95 ${
+            className={`h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-2xl text-xs font-medium flex items-center gap-1.5 shrink-0 transition active:scale-95 ${
               showFavoritesOnly
                 ? 'bg-[#FF9500]/25 text-[#FF9F0A] border border-[#FF9500]/50 shadow-[0_0_12px_rgba(255,149,0,0.35)]'
                 : 'liquid-glass-pill text-white/60 hover:text-white hover:bg-white/[0.14]'
             }`}
             title="Afficher les favoris"
           >
-            <Star className={`w-4 h-4 stroke-[2] ${showFavoritesOnly ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
+            <Star className={`w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2] ${showFavoritesOnly ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
             {favoritesCount > 0 && (
               <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
                 showFavoritesOnly ? 'bg-[#FF9500]/40 text-white' : 'bg-white/10 text-white/70'
