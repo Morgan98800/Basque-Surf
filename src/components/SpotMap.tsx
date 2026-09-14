@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { Navigation, Star, Clock, ChevronRight, X } from 'lucide-react';
+import { Navigation, Star, Clock, ChevronRight, X, Video } from 'lucide-react';
 import { openDirectMaps } from './GPSActionSheet';
+import { getSpotWebcamUrl } from '../data/spots';
 
 interface SpotMapProps {
   spots: Array<{ spot: Spot; score: SpotScore; tide: TideData; isFavorite: boolean }>;
@@ -303,6 +304,19 @@ export const SpotMap: React.FC<SpotMapProps> = ({
             >
               <Star className={`w-4 h-4 stroke-[2] ${activeSpotData.isFavorite ? 'fill-[#FF9500] text-[#FF9500]' : ''}`} />
             </button>
+
+            {/* Webcam Live direct */}
+            <a
+              href={getSpotWebcamUrl(activeSpotData.spot)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-11 w-11 shrink-0 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.1] text-red-400 active:scale-95 transition relative"
+              aria-label="Webcam en direct"
+              title="Voir la webcam en direct"
+            >
+              <Video className="w-4 h-4 stroke-[2.2]" />
+              <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            </a>
 
             {/* Fiche & Marée (44px Apple HIG) */}
             <button

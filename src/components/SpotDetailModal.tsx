@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Spot, SpotScore, TideData } from '../types/index';
-import { X, Star, AlertTriangle, Wind, Waves, Clock, Navigation } from 'lucide-react';
+import { X, Star, AlertTriangle, Wind, Waves, Clock, Navigation, Video, ExternalLink } from 'lucide-react';
 import { openDirectMaps } from './GPSActionSheet';
+import { getSpotWebcamUrl } from '../data/spots';
 
 interface SpotDetailModalProps {
   spot: Spot | null;
@@ -49,6 +50,7 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
 
   if (!spot || !score || !tide) return null;
 
+  const webcamUrl = getSpotWebcamUrl(spot);
   const currentHour = new Date().getHours();
   const activeHourIndex = scrubIndex !== null ? scrubIndex : (isToday ? Math.min(23, currentHour) : 12);
   const activeHourlyPoint = tide.hourlyCurve[activeHourIndex] || tide.hourlyCurve[0];
@@ -227,6 +229,39 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
               <span className="leading-snug font-medium">{score.warning}</span>
             </div>
           )}
+
+          {/* Bouton Webcam Live / Vue en direct */}
+          <a
+            href={webcamUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-red-500/10 via-white/[0.04] to-sky-500/10 hover:from-red-500/20 hover:to-sky-500/20 border border-white/[0.12] hover:border-white/[0.25] transition-all duration-200 active:scale-[0.985] text-white shadow-lg select-none"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/35 flex items-center justify-center shrink-0">
+                <Video className="w-4.5 h-4.5 text-red-400 stroke-[2.2]" />
+                <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                </span>
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-white tracking-tight">Vue en direct (Webcam)</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/25 text-red-400 border border-red-500/35 tracking-wider">
+                    Live
+                  </span>
+                </div>
+                <p className="text-[11px] text-white/50 truncate">
+                  Vérifier l'état des vagues et du plan d'eau en temps réel
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-white/40 group-hover:text-white transition-colors shrink-0 ml-2">
+              <span className="text-xs font-semibold hidden xs:inline text-sky-400 group-hover:text-sky-300">Voir</span>
+              <ExternalLink className="w-4 h-4 stroke-[2]" />
+            </div>
+          </a>
 
           {/* Courbe Continue Fluide façon Apple Météo avec Scrubbing */}
           <div className="space-y-2">
@@ -453,13 +488,27 @@ export const SpotDetailModal: React.FC<SpotDetailModalProps> = ({
 
         </div>
 
-        {/* Bottom Action: Bouton Pleine Largeur Style Apple Plans */}
-        <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-white/[0.08] bg-[#161618]">
+        {/* Bottom Actions: Webcam en direct + Itinéraire */}
+        <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-white/[0.08] bg-[#161618] flex items-center gap-2.5">
+          <a
+            href={webcamUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 h-12 px-3 sm:px-4 rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.12] active:scale-[0.985] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-sm select-none"
+          >
+            <div className="relative flex items-center justify-center">
+              <Video className="w-4 h-4 text-red-400 stroke-[2.2]" />
+              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            </div>
+            <span>Webcam Live</span>
+            <ExternalLink className="w-3.5 h-3.5 text-white/40 stroke-[2]" />
+          </a>
+
           <button
             onClick={() => openDirectMaps(spot.lat, spot.lon, spot.name)}
-            className="w-full h-12 px-6 rounded-2xl bg-[#007AFF] hover:bg-[#0062cc] active:scale-[0.985] text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition shadow-[0_4px_20px_rgba(0,122,255,0.35)]"
+            className="flex-1 h-12 px-3 sm:px-4 rounded-2xl bg-[#007AFF] hover:bg-[#0062cc] active:scale-[0.985] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-[0_4px_20px_rgba(0,122,255,0.35)]"
           >
-            <Navigation className="w-4.5 h-4.5 fill-white stroke-white" />
+            <Navigation className="w-4 h-4 fill-white stroke-white" />
             <span>Itinéraire</span>
           </button>
         </div>

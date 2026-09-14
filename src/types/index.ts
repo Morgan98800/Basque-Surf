@@ -40,6 +40,7 @@ export interface Spot {
   lat: number;
   lon: number;
   photoUrl?: string;
+  webcamUrl?: string;
 }
 
 export interface TideExtreme {

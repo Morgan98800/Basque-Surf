@@ -37,7 +37,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest / Nord-Ouest 1m à 2.2m',
     description: 'Le spot de beach-break réputé mondialement pour ses tubes creux et puissants le long des épis.',
     lat: 43.5242,
-    lon: -1.5303
+    lon: -1.5303,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18251-france-aquitaine-anglet-les-cavaliers'
   },
   {
     id: 'anglet-chambre-amour',
@@ -65,7 +66,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Nord-Ouest / Ouest 1m à 2m',
     description: 'Niché au pied de la falaise du phare de Biarritz, offre de jolies gauches et droites plus calmes.',
     lat: 43.5025,
-    lon: -1.5428
+    lon: -1.5428,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18252-france-aquitaine-anglet-la-chambre-damour'
   },
   {
     id: 'anglet-marinella',
@@ -93,7 +95,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 0.8m à 1.8m',
     description: 'Plage très conviviale et polyvalente, idéale pour progresser ou surfer en shortboard / longboard.',
     lat: 43.5086,
-    lon: -1.5383
+    lon: -1.5383,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18253-france-aquitaine-anglet-sables-dor'
   },
   {
     id: 'anglet-corsaires',
@@ -121,7 +124,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2m',
     description: 'Beach-break encadré par des digues rocheuses qui canalisent de belles sections dynamiques.',
     lat: 43.5115,
-    lon: -1.5365
+    lon: -1.5365,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18253-france-aquitaine-anglet-sables-dor'
   },
   {
     id: 'anglet-madrague',
@@ -149,7 +153,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2m',
     description: 'Grande plage ouverte offrant de multiples pics pour répartir les surfeurs.',
     lat: 43.5181,
-    lon: -1.5336
+    lon: -1.5336,
+    webcamUrl: 'https://www.anglet-tourisme.com/webcams/'
   },
   {
     id: 'anglet-la-barre',
@@ -177,7 +182,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Grosse houle Ouest / Nord-Ouest > 2.5m',
     description: 'Spot historique du surf français, aujourd’hui spot de repli protégé quand l’océan sature ailleurs.',
     lat: 43.5302,
-    lon: -1.5244
+    lon: -1.5244,
+    webcamUrl: 'https://www.anglet-tourisme.com/webcams/'
   },
 
   // --- BIARRITZ ---
@@ -208,7 +214,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest / Nord-Ouest 0.8m à 2m',
     description: 'Le berceau du surf européen ! Cadre exceptionnel avec vue sur la Villa Belza et la côte espagnole. Paradis des longboarders.',
     lat: 43.4776,
-    lon: -1.5694
+    lon: -1.5694,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18254-france-aquitaine-biarritz-cote-des-basques'
   },
   {
     id: 'biarritz-grande-plage',
@@ -236,7 +243,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest / Nord-Ouest 1m à 1.8m',
     description: 'Au cœur de la ville impériale entre le Casino et l’Hôtel du Palais, vagues rapides et dynamiques.',
     lat: 43.4851,
-    lon: -1.5583
+    lon: -1.5583,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18255-france-aquitaine-biarritz-grande-plage'
   },
   {
     id: 'biarritz-miramar',
@@ -264,7 +272,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2m',
     description: 'Petite plage au nord de la Grande Plage, plus sauvage avec un pic technique apprécié des bodyboarders et shortboards.',
     lat: 43.4883,
-    lon: -1.5539
+    lon: -1.5539,
+    webcamUrl: 'https://www.biarritz.fr/webcams'
   },
   {
     id: 'biarritz-marbella',
@@ -292,7 +301,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2.2m',
     description: 'Prolongement sauvage de la Côte des Basques, vagues plus puissantes et plus creuses sur fond mixte sable et roches.',
     lat: 43.4716,
-    lon: -1.5727
+    lon: -1.5727,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18256-france-aquitaine-biarritz-marbella'
   },
   {
     id: 'biarritz-milady',
@@ -320,7 +330,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2m',
     description: 'Grande plage familiale avec promenade, proposant un beach-break rapide et tonique.',
     lat: 43.4678,
-    lon: -1.5746
+    lon: -1.5746,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18256-france-aquitaine-biarritz-marbella'
   },
 
   // --- BIDART ---
@@ -350,7 +361,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 1.8m',
     description: 'Spot somptueux surplombé par le château d’Ilbarritz, parfait pour une session décontractée.',
     lat: 43.4578,
-    lon: -1.5786
+    lon: -1.5786,
+    webcamUrl: 'https://www.bidarttourisme.com/webcams/'
   },
   {
     id: 'bidart-erretegia',
@@ -378,7 +390,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2m',
     description: 'Crique naturelle préservée au pied de falaises verdoyantes, vague authentique et cadre sauvage.',
     lat: 43.4475,
-    lon: -1.5912
+    lon: -1.5912,
+    webcamUrl: 'https://www.bidarttourisme.com/webcams/'
   },
   {
     id: 'bidart-centre',
@@ -406,7 +419,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 1.8m',
     description: 'Plage centrale accessible depuis le village basque typique de Bidart, plusieurs pics accessibles.',
     lat: 43.4402,
-    lon: -1.5971
+    lon: -1.5971,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18257-france-aquitaine-bidart-plage-du-centre'
   },
   {
     id: 'bidart-uhabia',
@@ -434,7 +448,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2m',
     description: 'Bancs de sable alimentés par la rivière de l’Uhabia, offrant parfois de jolis bancs calés.',
     lat: 43.4338,
-    lon: -1.6033
+    lon: -1.6033,
+    webcamUrl: 'https://www.bidarttourisme.com/webcams/'
   },
 
   // --- GUÉTHARY ---
@@ -464,7 +479,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest / Nord-Ouest 1.5m à 4m+',
     description: 'L’un des reefs de gros les plus célèbres d’Europe. Une droite majestueuse qui tient la houle jusqu’à plus de 5 mètres.',
     lat: 43.4258,
-    lon: -1.6112
+    lon: -1.6112,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18258-france-aquitaine-guethary-parlementia'
   },
   {
     id: 'guethary-cenitz',
@@ -492,7 +508,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2.2m',
     description: 'Baie classée espace naturel. Offre une longue droite au fond pour les longboards et une gauche plus creuse sur la plage.',
     lat: 43.4192,
-    lon: -1.6174
+    lon: -1.6174,
+    webcamUrl: 'https://www.guethary-tourisme.com/webcams/'
   },
   {
     id: 'guethary-alcyons',
@@ -520,7 +537,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1.5m à 2.5m',
     description: 'Reef break de gauche court, rapide et très technique réservé aux surfeurs aguerris.',
     lat: 43.4241,
-    lon: -1.6091
+    lon: -1.6091,
+    webcamUrl: 'https://www.guethary-tourisme.com/webcams/'
   },
 
   // --- SAINT-JEAN-DE-LUZ ---
@@ -550,7 +568,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Nord-Ouest / Ouest 1.2m à 3m',
     description: 'Le joyau basque ! Point break de droite parfait déroulant sur plusieurs centaines de mètres le long de la falaise.',
     lat: 43.4144,
-    lon: -1.6258
+    lon: -1.6258,
+    webcamUrl: 'https://www.saint-jean-de-luz.com/webcams/'
   },
   {
     id: 'st-jean-erromardie',
@@ -578,7 +597,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2m',
     description: 'Jolie baie protégée avec un pic de gauche et de droite sur fond mixte galets/roches.',
     lat: 43.4075,
-    lon: -1.6386
+    lon: -1.6386,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18260-france-aquitaine-saint-jean-de-luz-plage-erromardie'
   },
   {
     id: 'st-jean-sainte-barbe',
@@ -606,7 +626,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Grosse houle Ouest / Nord-Ouest > 3m',
     description: 'Spot de repli absolu ! Quand la côte est déchaînée et impraticable, une droite magique et abritée se lève au fond de la baie.',
     lat: 43.3986,
-    lon: -1.6622
+    lon: -1.6622,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18259-france-aquitaine-saint-jean-de-luz-sainte-barbe'
   },
 
   // --- HENDAYE ---
@@ -636,7 +657,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest / Nord-Ouest 1.2m à 3.5m',
     description: 'La plus grande plage de la Côte Basque française, abritée dans la baie de Chingoudy. Le paradis des débutants et le spot de repli ultime quand la côte sature.',
     lat: 43.3742,
-    lon: -1.7711
+    lon: -1.7711,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18262-france-aquitaine-hendaye-grande-plage'
   },
   {
     id: 'hendaye-casino',
@@ -664,7 +686,8 @@ export const BASQUE_SPOTS: Spot[] = [
     bestSwell: 'Ouest 1m à 2.5m',
     description: 'Au centre de la promenade hendayaise, vagues douces et sécurisantes pour apprendre et progresser sans stress.',
     lat: 43.3725,
-    lon: -1.7803
+    lon: -1.7803,
+    webcamUrl: 'https://www.viewsurf.com/univers/plage/vue/18262-france-aquitaine-hendaye-grande-plage'
   }
 ];
 
@@ -676,3 +699,16 @@ export const BASQUE_TOWNS: BasqueTown[] = [
   'Saint-Jean-de-Luz',
   'Hendaye'
 ];
+
+export const TOWN_WEBCAMS: Record<BasqueTown, string> = {
+  'Anglet': 'https://www.anglet-tourisme.com/webcams/',
+  'Biarritz': 'https://www.biarritz.fr/webcams',
+  'Bidart': 'https://www.bidarttourisme.com/webcams/',
+  'Guéthary': 'https://www.guethary-tourisme.com/webcams/',
+  'Saint-Jean-de-Luz': 'https://www.saint-jean-de-luz.com/webcams/',
+  'Hendaye': 'https://www.hendaye-tourisme.fr/webcams/'
+};
+
+export const getSpotWebcamUrl = (spot: Spot): string => {
+  return spot.webcamUrl || TOWN_WEBCAMS[spot.town] || 'https://www.viewsurf.com';
+};
