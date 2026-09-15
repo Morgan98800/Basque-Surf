@@ -48,7 +48,22 @@ export const SpotMap: React.FC<SpotMapProps> = ({
       maxBounds: BASQUE_BOUNDS,
       maxBoundsViscosity: 0.9,
       zoomControl: false,
+      scrollWheelZoom: false, // Empêche Leaflet d'intercepter la molette et de bloquer le défilement de la page sur PC
     });
+
+    // Permet de zoomer à la molette uniquement si la touche Ctrl ou Cmd est maintenue (comme Google Maps / Apple Maps)
+    const container = mapContainerRef.current;
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+          map.zoomIn();
+        } else if (e.deltaY > 0) {
+          map.zoomOut();
+        }
+      }
+    };
+    container.addEventListener('wheel', handleWheel, { passive: false });
 
     // Tuiles CARTO Voyager couleur par défaut (océan bleu, sable doré, topographie côtière)
     const initialLayer = L.tileLayer(
@@ -75,6 +90,7 @@ export const SpotMap: React.FC<SpotMapProps> = ({
     mapInstanceRef.current = map;
 
     return () => {
+      container.removeEventListener('wheel', handleWheel);
       map.remove();
       mapInstanceRef.current = null;
     };
@@ -203,7 +219,7 @@ export const SpotMap: React.FC<SpotMapProps> = ({
   };
 
   return (
-    <div className="relative w-full h-[68vh] min-h-[460px] max-h-[720px] rounded-3xl overflow-hidden border border-white/[0.1] shadow-2xl flex flex-col">
+    <div className="relative w-full h-full min-h-[420px] rounded-3xl overflow-hidden flex flex-col">
       
       {/* Conteneur Leaflet */}
       <div ref={mapContainerRef} className="flex-1 w-full h-full z-10" />

@@ -182,7 +182,7 @@ export const App: React.FC = () => {
   }, [spotsWithScores, searchTerm, selectedTown, showFavoritesOnly]);
 
   return (
-    <div className="min-h-screen bg-[#03070d] relative text-white selection:bg-[#007AFF] selection:text-white font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[#03070d] relative text-white selection:bg-[#007AFF] selection:text-white font-sans antialiased">
       
       {/* Vrai Fond Lumineux Ambiant avec Dérive Continue (Ambient Orbs) */}
       <div className="ambient-glow" />
@@ -197,7 +197,7 @@ export const App: React.FC = () => {
         <Header tideData={activeHeaderTide} />
 
         {/* Conteneur Principal : Mobile Single-Column / Desktop Split-View Apple Plans */}
-        <main className="flex-1 max-w-7xl w-full min-w-0 mx-auto px-4 sm:px-6 pt-3 pb-24 sm:pb-24 overflow-x-hidden">
+        <main className="flex-1 max-w-7xl w-full min-w-0 mx-auto px-4 sm:px-6 pt-3 pb-24 sm:pb-24">
           
           <div className="flex flex-col lg:flex-row gap-5 items-start w-full min-w-0">
             
